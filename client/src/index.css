@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cyber-bg text-gray-100 font-sans antialiased overflow-x-hidden;
+    background-image: radial-gradient(circle at 50% -20%, rgba(6, 182, 212, 0.15) 0%, transparent 60%);
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-cyber-bg;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-border rounded-full hover:bg-cyber-glow transition-all;
+  }
+}
+
+@layer utilities {
+  .glass-nav {
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+  }
+
+  .glass-card {
+    background: rgba(10, 15, 29, 0.55);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(17, 30, 53, 0.7);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    border-color: rgba(6, 182, 212, 0.4);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+    transform: translateY(-4px);
+  }
+
+  .neon-text-cyan {
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.6), 0 0 20px rgba(6, 182, 212, 0.3);
+  }
+
+  .neon-text-green {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+
+  .neon-border-cyan {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.2), inset 0 0 15px rgba(6, 182, 212, 0.1);
+    border-color: rgba(6, 182, 212, 0.5);
+  }
+
+  .grid-overlay {
+    background-image: 
+      linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: center;
+  }
+
+  .dots-overlay {
+    background-image: radial-gradient(rgba(6, 182, 212, 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+}
+
+/* Custom CSS animations and styles */
+.code-marquee-container {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  border-top: 1px solid rgba(6, 182, 212, 0.15);
+  border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+  background: rgba(5, 7, 15, 0.8);
+}
+
+.code-marquee-content {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-around;
+  min-width: 100%;
+  gap: 2rem;
+}
+
+/* Custom glowing scanner line */
+.cyber-scanner {
+  background: linear-gradient(to bottom, transparent, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.5), transparent);
+  animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
