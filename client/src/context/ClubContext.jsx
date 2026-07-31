@@ -98,18 +98,7 @@ export const ClubProvider = ({ children }) => {
   };
 
   
-  const resetToDefaults = async () => {
-    try {
-      const response = await fetch('/api/reset', {
-        method: 'POST'
-      });
-      if (response.ok) {
-        await fetchAllData();
-      }
-    } catch (error) {
-      console.error('Reset request failed:', error);
-    }
-  };
+
 
   
   const addProject = async (project) => {
@@ -356,7 +345,7 @@ export const ClubProvider = ({ children }) => {
   return (
     <ClubContext.Provider value={{
       projects, events, glossary, team, roster, isAdminLoggedIn, loggedInUser, loading,
-      login, logout, resetToDefaults,
+      login, logout,
       addProject, updateProject, deleteProject,
       addEvent, updateEvent, deleteEvent,
       addGlossary, updateGlossary, deleteGlossary,

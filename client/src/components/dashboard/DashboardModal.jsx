@@ -510,7 +510,7 @@ const DashboardModal = ({
                   </>
                 )}
 
-                    {activeTab === 'my_profile' && modalType === 'edit' && loggedInUser?.role === 'super' && (
+                    {(activeTab === 'my_profile' || activeTab === 'my_record') && modalType === 'edit' && (
                       <div className="pt-4 border-t border-cyber-border/20 space-y-3">
                         <p className="text-[10px] font-mono text-yellow-400 uppercase tracking-widest">Change Login Credentials (optional)</p>
                         <div className="grid grid-cols-2 gap-4">

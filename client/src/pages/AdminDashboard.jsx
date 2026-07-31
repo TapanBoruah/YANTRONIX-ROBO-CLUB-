@@ -182,7 +182,7 @@ const AdminDashboard = () => {
         const memberType = formData.type || 'core';
         await updateTeamMember(editId, formData, memberType);
 
-        if (activeTab === 'my_profile' && loggedInUser?.role === 'super' && (formData.newUsername || formData.newPassword)) {
+        if (activeTab === 'my_profile' && (formData.newUsername || formData.newPassword)) {
           const credRes = await updateCredentials(loggedInUser.id, formData.newUsername, formData.newPassword);
           if (!credRes.success) {
             alert('Profile saved, but credential update failed: ' + credRes.message);
@@ -194,7 +194,14 @@ const AdminDashboard = () => {
       if (modalType === 'add') {
         addRosterMember(formData);
       } else {
-        updateRosterMember(editId, formData);
+        await updateRosterMember(editId, formData);
+
+        if (activeTab === 'my_record' && (formData.newUsername || formData.newPassword)) {
+          const credRes = await updateCredentials(loggedInUser.id, formData.newUsername, formData.newPassword);
+          if (!credRes.success) {
+            alert('Profile saved, but credential update failed: ' + credRes.message);
+          }
+        }
       }
     }
 

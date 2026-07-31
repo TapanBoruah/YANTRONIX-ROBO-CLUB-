@@ -25,6 +25,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET || 'mock',
 });
 
+
 let upload;
 if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
   const storage = new CloudinaryStorage({
@@ -68,7 +69,11 @@ router.post('/auth/login', async (req, res) => {
     const { username, password } = req.body;
     const cleanUsername = username.trim().toLowerCase();
 
-    const user = await User.findOne({ username: cleanUsername });
+    let user = await User.findOne({ username: cleanUsername });
+    if (!user) {
+      user = await User.findOne({ username: username.trim() });
+    }
+
     if (!user || user.password !== password) {
       return res.status(401).json({ message: 'Invalid access credentials.' });
     }
@@ -237,41 +242,6 @@ router.post('/users/create', async (req, res) => {
 
 
 
-router.post('/reset', async (req, res) => {
-  try {
-    
-    await Project.deleteMany({});
-    await Event.deleteMany({});
-    await Glossary.deleteMany({});
-    await TeamMember.deleteMany({});
-    await Roster.deleteMany({});
-    await User.deleteMany({});
-
-    
-    const projects = await Project.insertMany(defaultProjects);
-    const events = await Event.insertMany(defaultEvents);
-    const glossary = await Glossary.insertMany(defaultGlossary);
-    const team = await TeamMember.insertMany(defaultTeam);
-    const roster = await Roster.insertMany(defaultRoster);
-
-    
-    const superAdmins = ['president', 'vp', 'webcoord'];
-    for (const username of superAdmins) {
-      await User.create({
-        username,
-        password: 'admin123',
-        role: 'super',
-        targetId: 'super'
-      });
-    }
-
-    res.json({ message: 'Database reset successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-
 
 
 router.get('/projects', async (req, res) => {
@@ -399,7 +369,7 @@ router.get('/team', async (req, res) => {
     const members = await TeamMember.find().sort({ order: 1, createdAt: 1 });
     const membersWithCreds = await Promise.all(
       members.map(async (m) => {
-        const user = await User.findOne({ targetId: m._id.toString() });
+        const user = await User.findOne({ targetId: { $in: [m._id.toString(), m.rosterId].filter(Boolean) } });
         const mObj = m.toObject();
         if (user) {
           mObj.username = user.username;
