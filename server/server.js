@@ -29,13 +29,25 @@ app.get('/', (req, res) => {
 
 
 console.log(`Connecting to MongoDB at: ${mongoURI}`);
-mongoose.connect(mongoURI, { family: 4 })
-  .then(() => {
-    console.log('MongoDB Connected Successfully.');
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+if (!process.env.VERCEL) {
+  mongoose.connect(mongoURI, { family: 4 })
+    .then(() => {
+      console.log('MongoDB Connected Successfully.');
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('Database connection error:', err);
     });
-  })
-  .catch((err) => {
-    console.error('Database connection error:', err);
-  });
+} else {
+  mongoose.connect(mongoURI, { family: 4 })
+    .then(() => {
+      console.log('MongoDB Connected Successfully.');
+    })
+    .catch((err) => {
+      console.error('Database connection error:', err);
+    });
+}
+
+export default app;
