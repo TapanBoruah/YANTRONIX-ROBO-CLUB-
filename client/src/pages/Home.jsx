@@ -7,7 +7,7 @@ import DronesCanvas from '../components/animations/DronesCanvas';
 import { ArrowRight, Cpu, Code, Zap, Award, BookOpen, Calendar, HelpCircle } from 'lucide-react';
 
 const Home = () => {
-  const { projects, events } = useContext(ClubContext);
+  const { projects, events, loading } = useContext(ClubContext);
 
   
   const featuredProjects = projects.slice(0, 3);
@@ -56,7 +56,7 @@ const Home = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-gray-400 text-base sm:text-lg max-w-xl leading-relaxed"
             >
-              Welcome to <strong>Yantronix</strong>, the Robotics and Automation Club of NIT Arunachal Pradesh. Our focus is primarily on mechanical structural design, linkage aerodynamics, and gearbox transmissions, integrated with control electronics.
+              Welcome to <strong>यंत्रONIX </strong>, the Robotics and Automation Club of NIT Arunachal Pradesh. Our focus is primarily on mechanical structural design, linkage aerodynamics, and gearbox transmissions, integrated with control electronics.
             </motion.p>
 
             {}
@@ -168,35 +168,50 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredProjects.map((project) => (
-              <div key={project.id} className="glass-card rounded-2xl overflow-hidden flex flex-col text-left group">
-                <div className="relative aspect-video w-full overflow-hidden bg-slate-900 border-b border-cyber-border/40">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-cyber-card via-transparent to-transparent opacity-90"></div>
-                </div>
-                <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.tags.map(tag => (
-                        <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyber-border/60 text-cyan-400">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <h3 className="text-xl font-bold font-sans text-white group-hover:text-cyber-glow transition-colors duration-300">
-                      {project.title}
-                    </h3>
-                    <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">
-                      {project.description}
-                    </p>
-                  </div>
+            {loading ? (
+              <div className="col-span-3 py-16 flex flex-col items-center justify-center space-y-4">
+                <div className="w-10 h-10 rounded-full border-4 border-cyber-glow/20 border-t-cyber-glow animate-spin"></div>
+                <p className="text-sm font-mono text-cyan-400 animate-pulse tracking-wider">RETRIEVING PROJECTS...</p>
+              </div>
+            ) : featuredProjects.length === 0 ? (
+              <div className="col-span-3 py-16 text-center glass-card rounded-2xl flex flex-col items-center justify-center space-y-4">
+                <Cpu className="w-12 h-12 text-cyan-400 animate-bounce" />
+                <div>
+                  <h4 className="text-base font-bold text-white font-mono uppercase">Projects Coming Soon</h4>
+                  <p className="text-xs text-gray-500 max-w-sm mt-1 mx-auto leading-relaxed">Our research and development logs are currently being initialized. Stay tuned for structural blueprints.</p>
                 </div>
               </div>
-            ))}
+            ) : (
+              featuredProjects.map((project) => (
+                <div key={project.id} className="glass-card rounded-2xl overflow-hidden flex flex-col text-left group">
+                  <div className="relative aspect-video w-full overflow-hidden bg-slate-900 border-b border-cyber-border/40">
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-cyber-card via-transparent to-transparent opacity-90"></div>
+                  </div>
+                  <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.tags.map(tag => (
+                          <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyber-border/60 text-cyan-400">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <h3 className="text-xl font-bold font-sans text-white group-hover:text-cyber-glow transition-colors duration-300">
+                        {project.title}
+                      </h3>
+                      <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">
+                        {project.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -223,23 +238,38 @@ const Home = () => {
           </div>
 
           <div className="lg:col-span-8 flex flex-col gap-6">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="glass-card p-6 rounded-2xl flex flex-col sm:flex-row gap-6 items-start sm:items-center text-left border-l-4 border-l-cyber-glow">
-                <div className="flex-grow space-y-2">
-                  <div className="flex items-center space-x-2 text-xs font-mono text-cyber-glow">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{event.date}</span>
-                    <span>&bull;</span>
-                    <span className="px-2 py-0.5 rounded bg-cyber-border text-emerald-400 text-[10px]">
-                      {event.type}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold font-sans text-white">{event.title}</h3>
-                  <p className="text-xs text-gray-400 leading-relaxed">{event.description}</p>
-                  <p className="text-[10px] font-mono text-gray-500">Venue: {event.location}</p>
+            {loading ? (
+              <div className="py-16 flex flex-col items-center justify-center space-y-4">
+                <div className="w-10 h-10 rounded-full border-4 border-cyber-glow/20 border-t-cyber-glow animate-spin"></div>
+                <p className="text-sm font-mono text-cyan-400 animate-pulse tracking-wider">RETRIEVING SCHEDULE...</p>
+              </div>
+            ) : upcomingEvents.length === 0 ? (
+              <div className="py-16 text-center glass-card rounded-2xl flex flex-col items-center justify-center space-y-4">
+                <Calendar className="w-12 h-12 text-cyan-400 animate-pulse" />
+                <div>
+                  <h4 className="text-base font-bold text-white font-mono uppercase">Schedule Coming Soon</h4>
+                  <p className="text-xs text-gray-500 max-w-sm mt-1 mx-auto leading-relaxed">No upcoming events scheduled at this moment. The academic calendar telemetry is updating.</p>
                 </div>
               </div>
-            ))}
+            ) : (
+              upcomingEvents.map((event) => (
+                <div key={event.id} className="glass-card p-6 rounded-2xl flex flex-col sm:flex-row gap-6 items-start sm:items-center text-left border-l-4 border-l-cyber-glow">
+                  <div className="flex-grow space-y-2">
+                    <div className="flex items-center space-x-2 text-xs font-mono text-cyber-glow">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>{event.date}</span>
+                      <span>&bull;</span>
+                      <span className="px-2 py-0.5 rounded bg-cyber-border text-emerald-400 text-[10px]">
+                        {event.type}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold font-sans text-white">{event.title}</h3>
+                    <p className="text-xs text-gray-400 leading-relaxed">{event.description}</p>
+                    <p className="text-[10px] font-mono text-gray-500">Venue: {event.location}</p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
         </div>

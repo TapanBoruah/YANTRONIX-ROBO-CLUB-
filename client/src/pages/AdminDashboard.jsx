@@ -232,7 +232,7 @@ const AdminDashboard = () => {
       <header className="border-b border-cyber-border/80 bg-cyber-card/50 backdrop-blur-md relative z-20 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Shield className="w-5 h-5 text-cyber-glow animate-pulse" />
-          <h1 className="text-lg font-bold font-sans tracking-wide text-white">YANTRONIX CONTROL COCKPIT</h1>
+          <h1 className="text-lg font-bold font-sans tracking-wide text-white">यंत्रonix CONTROL COCKPIT</h1>
         </div>
         <div className="flex items-center space-x-4">
           <Link
@@ -354,7 +354,9 @@ const AdminDashboard = () => {
                 </p>
               </div>
               {}
-              {(loggedInUser?.role === 'super' || (loggedInUser?.role === 'rep' && (activeTab === 'team' || activeTab === 'roster'))) && (
+              {((loggedInUser?.role === 'super' || (loggedInUser?.role === 'rep' && (activeTab === 'team' || activeTab === 'roster'))) &&
+                activeTab !== 'my_profile' &&
+                activeTab !== 'my_record') && (
                 <button
                   onClick={openAddModal}
                   className="flex items-center space-x-1.5 px-4 py-2 bg-cyber-glow text-black font-semibold text-xs font-mono rounded hover:scale-103 transition-transform shadow-[0_0_12px_rgba(6,182,212,0.25)]"
@@ -390,13 +392,13 @@ const AdminDashboard = () => {
               {activeTab === 'my_profile' && (
                 loading
                   ? <div className="flex items-center justify-center py-20 text-sm font-mono text-gray-500"><span className="animate-pulse">Loading profile data...</span></div>
-                  : <MyProfileSection team={team} loggedInUser={loggedInUser} onEdit={openEditModal} />
+                  : <MyProfileSection team={team} loggedInUser={loggedInUser} onEdit={openEditModal} onLogout={handleLogout} />
               )}
 
               {activeTab === 'my_record' && (
                 loading
                   ? <div className="flex items-center justify-center py-20 text-sm font-mono text-gray-500"><span className="animate-pulse">Loading record data...</span></div>
-                  : <MyRecordSection roster={roster} loggedInUser={loggedInUser} onEdit={openEditModal} />
+                  : <MyRecordSection roster={roster} loggedInUser={loggedInUser} onEdit={openEditModal} onLogout={handleLogout} />
               )}
             </div>
 

@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { ClubProvider } from './context/ClubContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -43,10 +43,21 @@ function AppContent() {
   );
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <ClubProvider>
       <Router>
+        <ScrollToTop />
         <AppContent />
       </Router>
     </ClubProvider>

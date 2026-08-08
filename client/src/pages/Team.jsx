@@ -18,9 +18,39 @@ const LinkedinIcon = (props) => (
 );
 
 const Team = () => {
-  const { team } = useContext(ClubContext);
+  const { team, loading } = useContext(ClubContext);
+
+  const getInitials = (name) => {
+    if (!name) return 'Y';
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-cyan-500/20 border-t-cyan-500 animate-spin"></div>
+        <p className="text-sm font-mono text-cyan-400 animate-pulse tracking-wider">LOADING TEAM DIRECTORY...</p>
+      </div>
+    );
+  }
 
   const { coordinator, president, core, members } = team;
+
+  if (!coordinator && !president && core.length === 0 && members.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center min-h-[60vh] flex flex-col items-center justify-center space-y-6">
+        <div className="p-6 rounded-full bg-cyan-500/5 border border-cyan-500/20 text-cyan-400 animate-pulse">
+          <Shield className="w-16 h-16" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-white uppercase tracking-wider font-mono">Crew Assembly Pending</h2>
+          <p className="text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
+            The यंत्रonix crew list is being assembled. Please check back soon as clearance levels are established.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 text-left min-h-screen">
@@ -28,7 +58,7 @@ const Team = () => {
       {}
       <div className="space-y-2 mb-16 text-center lg:text-left">
         <h1 className="text-xs font-mono tracking-widest text-cyber-glow uppercase">ORGANIZATION</h1>
-        <p className="text-3xl sm:text-4xl font-bold font-sans">Meet the Yantronix Crew</p>
+        <p className="text-3xl sm:text-4xl font-bold font-sans">Meet the यंत्रonix Crew</p>
         <p className="text-sm text-gray-400 max-w-2xl leading-relaxed">
           The builders, programmers, and strategists coordinating robotics development, competitive hackathons, and administrative routines for NIT Arunachal Pradesh.
         </p>
@@ -40,8 +70,14 @@ const Team = () => {
         {}
         {coordinator && (
           <div className="glass-card p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row gap-6 items-center border-l-4 border-l-cyan-500">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative">
-              <img src={coordinator.image} alt={coordinator.name} className="w-full h-full object-cover" />
+            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
+              {coordinator.image ? (
+                <img src={coordinator.image} alt={coordinator.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-2xl select-none">
+                  {getInitials(coordinator.name)}
+                </div>
+              )}
             </div>
             <div className="space-y-3 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start space-x-1.5 text-cyan-400 font-mono text-xs">
@@ -66,8 +102,14 @@ const Team = () => {
         {}
         {president && (
           <div className="glass-card p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row gap-6 items-center border-l-4 border-l-emerald-500">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative">
-              <img src={president.image} alt={president.name} className="w-full h-full object-cover" />
+            <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
+              {president.image ? (
+                <img src={president.image} alt={president.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-2xl select-none">
+                  {getInitials(president.name)}
+                </div>
+              )}
             </div>
             <div className="space-y-3 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start space-x-1.5 text-emerald-400 font-mono text-xs">
@@ -103,9 +145,15 @@ const Team = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {core && core.map((member) => (
-            <div key={member.id} className="glass-card p-5 rounded-xl flex flex-col items-center sm:items-start text-center sm:text-left space-y-4">
-              <div className="w-20 h-20 rounded-full overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative group-hover:border-cyber-glow/50 transition-colors">
-                <img src={member.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'} alt={member.name} className="w-full h-full object-cover" />
+            <div key={member.id} className="glass-card p-5 rounded-xl flex flex-col items-center text-center justify-center space-y-4">
+              <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative group-hover:border-cyber-glow/50 transition-colors flex items-center justify-center">
+                {member.image ? (
+                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xl select-none">
+                    {getInitials(member.name)}
+                  </div>
+                )}
               </div>
               <div className="space-y-1.5 w-full">
                 <h3 className="text-base font-bold font-sans text-white leading-tight">{member.name}</h3>
@@ -113,7 +161,7 @@ const Team = () => {
                   {member.role}
                 </span>
               </div>
-              <div className="w-full flex justify-center sm:justify-start space-x-3 pt-2 border-t border-cyber-border/10">
+              <div className="w-full flex justify-center space-x-3 pt-2 border-t border-cyber-border/10">
                 <a href={member.github || 'https://github.com'} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-cyber-glow transition-colors duration-200">
                   <GithubIcon className="w-3.5 h-3.5" />
                 </a>
@@ -137,22 +185,39 @@ const Team = () => {
           {members && members.map((member) => (
             <div
               key={member.id}
-              className="px-4 py-2.5 rounded-lg border border-cyber-border/30 bg-cyber-card/30 text-xs text-gray-300 font-mono flex items-center justify-between"
+              className="glass-card p-4 rounded-xl flex flex-col items-center text-center justify-center space-y-3 border border-cyber-border/30"
             >
-              <div className="flex items-center space-x-2 truncate">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyber-glow animate-pulse"></div>
-                <span className="truncate">{member.name}</span>
+              <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
+                {member.image ? (
+                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xs select-none">
+                    {getInitials(member.name)}
+                  </div>
+                )}
               </div>
-              <div className="flex items-center space-x-2 ml-2 flex-shrink-0">
-                {member.github && (
+              <div className="w-full truncate">
+                <h3 className="text-xs font-bold font-sans text-white truncate leading-tight">{member.name}</h3>
+                <p className="text-[9px] text-gray-500 font-mono mt-0.5">Club Member</p>
+              </div>
+              <div className="flex justify-center space-x-2.5 pt-1.5 border-t border-cyber-border/10 w-full">
+                {member.github ? (
                   <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-cyber-glow transition-colors">
                     <GithubIcon className="w-3.5 h-3.5" />
                   </a>
+                ) : (
+                  <span className="text-gray-700 cursor-not-allowed">
+                    <GithubIcon className="w-3.5 h-3.5 opacity-30" />
+                  </span>
                 )}
-                {member.linkedin && (
+                {member.linkedin ? (
                   <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-cyber-glow transition-colors">
                     <LinkedinIcon className="w-3.5 h-3.5" />
                   </a>
+                ) : (
+                  <span className="text-gray-700 cursor-not-allowed">
+                    <LinkedinIcon className="w-3.5 h-3.5 opacity-30" />
+                  </span>
                 )}
               </div>
             </div>

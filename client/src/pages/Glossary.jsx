@@ -196,8 +196,39 @@ const ComponentDiagram = ({ symbol }) => {
 };
 
 const Glossary = () => {
-  const { glossary } = useContext(ClubContext);
+  const { glossary, loading } = useContext(ClubContext);
   const [selectedId, setSelectedId] = useState(glossary[0]?.id || '');
+
+  React.useEffect(() => {
+    if (!selectedId && glossary.length > 0) {
+      setSelectedId(glossary[0].id);
+    }
+  }, [glossary, selectedId]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-cyber-glow/20 border-t-cyber-glow animate-spin"></div>
+        <p className="text-sm font-mono text-cyan-400 animate-pulse tracking-wider">RETRIEVING SCHEMATICS FROM DATABASE...</p>
+      </div>
+    );
+  }
+
+  if (glossary.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center min-h-[60vh] flex flex-col items-center justify-center space-y-6">
+        <div className="p-6 rounded-full bg-cyber-glow/5 border border-cyber-glow/20 text-cyber-glow animate-pulse">
+          <Layers className="w-16 h-16" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-white uppercase tracking-wider font-mono">Glossary Coming Soon</h2>
+          <p className="text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
+            The technical component schematics library is being prepared. Hardware modules and sensory diagrams will be uploaded here shortly.
+          </p>
+        </div>
+      </div>
+    );
+  }
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredGlossary = glossary.filter(item =>

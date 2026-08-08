@@ -31,7 +31,7 @@ const Header = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold tracking-wider font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-cyber-glow group-hover:neon-text-cyan transition-all duration-300">
-                YANTRONIX
+                यंत्रonix
               </span>
               <span className="text-[10px] text-cyan-400 font-mono tracking-widest leading-none">
                 NIT ARUNACHAL PRADESH

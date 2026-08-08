@@ -3,7 +3,7 @@ import { ClubContext } from '../context/ClubContext';
 import { Calendar, MapPin, Tag, Video, Terminal } from 'lucide-react';
 
 const Events = () => {
-  const { events } = useContext(ClubContext);
+  const { events, loading } = useContext(ClubContext);
   const [filter, setFilter] = useState('All');
 
   const filteredEvents = filter === 'All'
@@ -11,6 +11,31 @@ const Events = () => {
     : events.filter(e => e.type.toLowerCase() === filter.toLowerCase());
 
   const categories = ['All', 'Workshop', 'Competition', 'Webinar'];
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-cyber-glow/20 border-t-cyber-glow animate-spin"></div>
+        <p className="text-sm font-mono text-cyan-400 animate-pulse tracking-wider">RETRIEVING DATA FROM DATABASE...</p>
+      </div>
+    );
+  }
+
+  if (events.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center min-h-[60vh] flex flex-col items-center justify-center space-y-6">
+        <div className="p-6 rounded-full bg-cyber-glow/5 border border-cyber-glow/20 text-cyber-glow animate-pulse">
+          <Calendar className="w-16 h-16" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-bold text-white uppercase tracking-wider font-mono">Events Coming Soon</h2>
+          <p className="text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
+            We are scheduling some exciting workshops, hackathons, and hardware design challenges. Telemetry links will go live here.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 text-left min-h-screen">

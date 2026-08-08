@@ -42,7 +42,7 @@ const Footer = () => {
                 <Cpu className="w-4 h-4 text-cyber-glow" />
               </div>
               <span className="text-lg font-bold tracking-wider text-white">
-                YANTRONIX
+                यंत्रonix
               </span>
             </Link>
             <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
@@ -106,12 +106,12 @@ const Footer = () => {
 
         <div className="mt-12 pt-6 border-t border-cyber-border/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-mono">
           <div>
-            &copy; {currentYear} Yantronix NIT AP. All Rights Reserved.
+            &copy; {currentYear} यंत्रonix NIT AP. All Rights Reserved.
           </div>
           <div className="flex space-x-4">
             <Link to="/admin/login" className="hover:text-cyber-glow transition-colors duration-200">Admin Login</Link>
             <span>&bull;</span>
-            <span className="text-gray-600">Created with React & Tailwind CSS</span>
+            <span className="text-gray-600">Website created by Krish & Tapan</span>
           </div>
         </div>
       </div>

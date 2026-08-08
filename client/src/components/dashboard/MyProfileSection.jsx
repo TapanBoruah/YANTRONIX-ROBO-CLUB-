@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MyProfileSection = ({ team, loggedInUser, onEdit }) => {
+const MyProfileSection = ({ team, loggedInUser, onEdit, onLogout }) => {
   let profileObj = null;
   let profileType = 'core';
 
@@ -17,9 +17,36 @@ const MyProfileSection = ({ team, loggedInUser, onEdit }) => {
 
   if (!profileObj) {
     return (
-      <div className="p-6 space-y-3">
-        <p className="text-sm font-mono text-red-400">Profile not found. Your account exists but the member record is missing.</p>
-        <p className="text-xs text-gray-500 font-mono">User ID: {loggedInUser?.id} — please ask your Web Coordinator to check your account in Manage Team.</p>
+      <div className="p-6 text-left max-w-xl mx-auto py-12">
+        <div className="glass-card p-8 rounded-2xl border-l-4 border-l-red-500 space-y-5 shadow-[0_0_20px_rgba(239,68,68,0.15)] bg-slate-950/40">
+          <div>
+            <span className="text-[10px] font-mono text-red-400 tracking-widest block uppercase mb-1">SYSTEM WARNING</span>
+            <h3 className="text-xl font-bold text-white">Profile Record Missing</h3>
+            <p className="text-sm font-mono text-gray-400 mt-2">
+              Your account exists in local storage, but the corresponding core member record was not found in the database.
+            </p>
+          </div>
+          
+          <div className="p-4 rounded-lg bg-red-950/20 border border-red-500/20 text-xs font-mono text-gray-400 space-y-2">
+            <p><span className="text-red-400 font-semibold">User ID:</span> {loggedInUser?.id}</p>
+            <p><span className="text-red-400 font-semibold">Username:</span> {loggedInUser?.name}</p>
+            <p><span className="text-red-400 font-semibold">Clearance Role:</span> {loggedInUser?.role}</p>
+          </div>
+
+          <p className="text-xs text-gray-500 font-mono leading-relaxed">
+            This usually happens if the database was re-seeded, or if your core member record was deleted or re-linked by the Web Coordinator.
+          </p>
+
+          <div className="flex flex-wrap gap-4 pt-2">
+            <button
+              type="button"
+              onClick={onLogout}
+              className="px-4 py-2 border border-red-500/50 hover:bg-red-500/10 text-red-400 text-xs font-mono rounded transition-all active:scale-95 duration-200"
+            >
+              Sign Out & Reset Session
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -29,8 +56,14 @@ const MyProfileSection = ({ team, loggedInUser, onEdit }) => {
   return (
     <div className="p-6 space-y-6 text-left">
       <div className="glass-card p-8 rounded-2xl flex flex-col md:flex-row gap-8 items-center md:items-start border-l-4 border-l-cyber-glow">
-        <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative">
-          <img src={profileObj.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80'} alt="" className="w-full h-full object-cover" />
+        <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
+          {profileObj.image ? (
+            <img src={profileObj.image} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-3xl select-none">
+              {profileObj.name ? profileObj.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'Y'}
+            </div>
+          )}
         </div>
         <div className="space-y-4 flex-grow">
           <div>

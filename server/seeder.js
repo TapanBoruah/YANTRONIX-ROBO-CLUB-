@@ -57,7 +57,7 @@ const seedDB = async () => {
 
     for (const admin of defaultAccounts) {
       const cleanUsername = admin.username.trim().toLowerCase();
-      
+
       const teamMember = await TeamMember.create({
         name: admin.name,
         type: admin.type,

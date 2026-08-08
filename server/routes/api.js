@@ -1,6 +1,12 @@
 import express from 'express';
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import dotenv from 'dotenv';
 import Project from '../models/Project.js';
@@ -29,6 +35,11 @@ cloudinary.config({
 
 
 let upload;
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
   const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -39,28 +50,29 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
   });
   upload = multer({ storage });
 } else {
-  console.warn('Cloudinary environment configuration missing! Falling back to Mock uploads.');
-  const storage = multer.memoryStorage();
+  console.warn('Cloudinary environment configuration missing! Falling back to Local DiskStorage uploads.');
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadsDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+  });
   upload = multer({ storage });
 }
 
 
 router.post('/upload', upload.single('image'), (req, res) => {
-  if (req.file && req.file.path) {
-    
-    return res.json({ url: req.file.path });
+  if (req.file) {
+    if (req.file.path && (req.file.path.startsWith('http://') || req.file.path.startsWith('https://'))) {
+      return res.json({ url: req.file.path });
+    }
+    const fileUrl = `/uploads/${req.file.filename}`;
+    return res.json({ url: fileUrl });
   }
-
-  
-  const placeholderImages = [
-    'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1616391182219-e080b4d1043a?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80'
-  ];
-  const randomUrl = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
-  return res.json({ url: randomUrl });
+  return res.status(400).json({ error: 'No file uploaded or invalid file type.' });
 });
 
 

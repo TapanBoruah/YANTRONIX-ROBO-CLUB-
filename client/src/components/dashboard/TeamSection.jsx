@@ -2,6 +2,10 @@ import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 
 const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
+  const getInitials = (name) => {
+    if (!name) return 'Y';
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  };
   return (
     <div className="p-6 space-y-6 text-left">
 
@@ -84,7 +88,13 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                 <tr key={member.id} className="hover:bg-cyber-darker/30 transition-colors">
                   <td className="px-4 py-3 font-semibold text-white">
                     <div className="flex items-center space-x-3">
-                      <img src={member.image || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&q=80'} alt="" className="w-8 h-8 rounded-full object-cover border border-cyber-border/60" />
+                      {member.image ? (
+                        <img src={member.image} alt="" className="w-8 h-8 rounded-full object-cover border border-cyber-border/60" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xs select-none border border-cyber-border/60">
+                          {getInitials(member.name)}
+                        </div>
+                      )}
                       <span>{member.name}</span>
                     </div>
                   </td>
