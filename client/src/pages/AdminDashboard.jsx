@@ -50,7 +50,7 @@ const AdminDashboard = () => {
   
   useEffect(() => {
     if (loggedInUser) {
-      if (loggedInUser.role === 'super' || loggedInUser.role === 'core') {
+      if (loggedInUser.role === 'super' || loggedInUser.role === 'core' || loggedInUser.role === 'rep') {
         setActiveTab('my_profile');
       } else if (loggedInUser.role === 'member') {
         setActiveTab('my_record');
@@ -257,35 +257,39 @@ const AdminDashboard = () => {
         
         {}
         <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-cyber-border/40 p-4 space-y-2 flex-shrink-0">
-          {loggedInUser?.role === 'super' && (
+          {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
             <>
-              <button
-                onClick={() => handleTabChange('projects')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === 'projects' ? 'bg-cyber-glow/15 text-cyber-glow border-l-2 border-cyber-glow' : 'text-gray-400 hover:text-gray-200 hover:bg-cyber-card/50'
-                }`}
-              >
-                <LayoutGrid className="w-4 h-4" />
-                <span>Manage Projects</span>
-              </button>
-              <button
-                onClick={() => handleTabChange('events')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === 'events' ? 'bg-cyber-glow/15 text-cyber-glow border-l-2 border-cyber-glow' : 'text-gray-400 hover:text-gray-200 hover:bg-cyber-card/50'
-                }`}
-              >
-                <Calendar className="w-4 h-4" />
-                <span>Manage Events</span>
-              </button>
-              <button
-                onClick={() => handleTabChange('glossary')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === 'glossary' ? 'bg-cyber-glow/15 text-cyber-glow border-l-2 border-cyber-glow' : 'text-gray-400 hover:text-gray-200 hover:bg-cyber-card/50'
-                }`}
-              >
-                <BookOpen className="w-4 h-4" />
-                <span>Manage Glossary</span>
-              </button>
+              {loggedInUser?.role === 'super' && (
+                <>
+                  <button
+                    onClick={() => handleTabChange('projects')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'projects' ? 'bg-cyber-glow/15 text-cyber-glow border-l-2 border-cyber-glow' : 'text-gray-400 hover:text-gray-200 hover:bg-cyber-card/50'
+                    }`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                    <span>Manage Projects</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange('events')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'events' ? 'bg-cyber-glow/15 text-cyber-glow border-l-2 border-cyber-glow' : 'text-gray-400 hover:text-gray-200 hover:bg-cyber-card/50'
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Manage Events</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange('glossary')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'glossary' ? 'bg-cyber-glow/15 text-cyber-glow border-l-2 border-cyber-glow' : 'text-gray-400 hover:text-gray-200 hover:bg-cyber-card/50'
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    <span>Manage Glossary</span>
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => handleTabChange('team')}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
@@ -307,7 +311,7 @@ const AdminDashboard = () => {
             </>
           )}
 
-          {(loggedInUser?.role === 'super' || loggedInUser?.role === 'core') && (
+          {(loggedInUser?.role === 'super' || loggedInUser?.role === 'core' || loggedInUser?.role === 'rep') && (
             <button
               onClick={() => handleTabChange('my_profile')}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
@@ -343,11 +347,14 @@ const AdminDashboard = () => {
                   {activeTab === 'my_profile' ? 'Core Profile' : activeTab === 'my_record' ? 'Student Record' : `${activeTab} Database`}
                 </h2>
                 <p className="text-xs text-gray-500 font-mono">
-                  {loggedInUser?.role === 'super' ? 'Clearance Level: Super Admin (Full Access)' : `Clearance Level: Restricted (${loggedInUser?.role.toUpperCase()})`}
+                  {loggedInUser?.role === 'super' && 'Clearance Level: Super Admin (Full Access)'}
+                  {loggedInUser?.role === 'rep' && 'Clearance Level: Student Representative (Restricted Access)'}
+                  {loggedInUser?.role === 'core' && 'Clearance Level: Core Committee Member (Profile Only)'}
+                  {loggedInUser?.role === 'member' && 'Clearance Level: Student Member (Record Only)'}
                 </p>
               </div>
               {}
-              {loggedInUser?.role === 'super' && (
+              {(loggedInUser?.role === 'super' || (loggedInUser?.role === 'rep' && (activeTab === 'team' || activeTab === 'roster'))) && (
                 <button
                   onClick={openAddModal}
                   className="flex items-center space-x-1.5 px-4 py-2 bg-cyber-glow text-black font-semibold text-xs font-mono rounded hover:scale-103 transition-transform shadow-[0_0_12px_rgba(6,182,212,0.25)]"

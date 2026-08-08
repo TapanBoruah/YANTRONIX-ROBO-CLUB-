@@ -325,18 +325,19 @@ const DashboardModal = ({
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="block text-xs font-mono text-gray-400 uppercase">Position Type</label>
+                      <label className="block text-xs font-mono text-gray-400 uppercase">Position Category</label>
                       <select
                         value={formData.position || 'core committee'}
                         onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                         className="w-full px-3 py-2.5 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
                       >
+                        <option value="faculty">Faculty Advisor/Coordinator</option>
                         <option value="president">President</option>
                         <option value="vice_president">Vice President</option>
                         <option value="web_coordinator">Web Coordinator</option>
+                        <option value="student_representative">Student Representative</option>
                         <option value="core committee">Core Committee</option>
                         <option value="member">Member</option>
-                        <option value="faculty">Faculty Advisor/Coordinator</option>
                       </select>
                     </div>
                   </>
@@ -351,6 +352,22 @@ const DashboardModal = ({
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
                       />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-mono text-gray-400 uppercase">Position Category</label>
+                      <select
+                        value={formData.position || 'core committee'}
+                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                        className="w-full px-3 py-2.5 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                      >
+                        <option value="faculty">Faculty Advisor/Coordinator</option>
+                        <option value="president">President</option>
+                        <option value="vice_president">Vice President</option>
+                        <option value="web_coordinator">Web Coordinator</option>
+                        <option value="student_representative">Student Representative</option>
+                        <option value="core committee">Core Committee</option>
+                        <option value="member">Member</option>
+                      </select>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">

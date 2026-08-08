@@ -47,20 +47,22 @@ const seedDB = async () => {
     console.log(`Seeded ${roster.length} Roster entries.`);
 
 
-    console.log('Seeding super admin user accounts with profiles...');
-    const superAdminsList = [
-      { name: 'TAPAN BORUAH', username: 'tapanboruah', position: 'president', role: 'Club President', order: 2 },
-      { name: 'PINTU KR SAH', username: 'pintukrsah', position: 'vice_president', role: 'Vice President', order: 3 },
-      { name: 'KRISH PRASAD', username: 'krishprasad', position: 'web_coordinator', role: 'Web Coordinator', order: 4 }
+    console.log('Seeding default user accounts with profiles...');
+    const defaultAccounts = [
+      { name: 'DR. MANJULA D GHATAK', username: 'faculty', position: 'faculty', role: 'Faculty Coordinator', type: 'coordinator', userRole: 'core', order: 1 },
+      { name: 'PINTU KR SAH', username: 'pintukrsah', position: 'president', role: 'Club President', type: 'president', userRole: 'super', order: 2 },
+      { name: 'TAPAN BORUAH', username: 'tapanboruah', position: 'vice_president', role: 'Vice President', type: 'core', userRole: 'super', order: 3 },
+      { name: 'KRISH PRASAD', username: 'krishprasad', position: 'web_coordinator', role: 'Web Coordinator', type: 'core', userRole: 'super', order: 4 }
     ];
 
-    for (const admin of superAdminsList) {
+    for (const admin of defaultAccounts) {
       const cleanUsername = admin.username.trim().toLowerCase();
       
       const teamMember = await TeamMember.create({
         name: admin.name,
-        type: admin.position === 'president' ? 'president' : 'core',
+        type: admin.type,
         role: admin.role,
+        position: admin.position,
         github: '', linkedin: '', email: '', image: '', order: admin.order
       });
 
@@ -78,7 +80,7 @@ const seedDB = async () => {
       await User.create({
         username: cleanUsername,
         password: 'admin123',
-        role: 'super',
+        role: admin.userRole,
         targetId: teamMember._id.toString()
       });
     }

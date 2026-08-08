@@ -26,6 +26,8 @@ cloudinary.config({
 });
 
 
+
+
 let upload;
 if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
   const storage = new CloudinaryStorage({
@@ -142,7 +144,7 @@ router.post('/users/create', async (req, res) => {
 
     if (position === 'president') {
       const teamMember = await TeamMember.create({
-        name, type: 'president', role: 'Club President',
+        name, type: 'president', role: 'Club President', position: 'president',
         github: '', linkedin: '', email: '', image: '', order: 2
       });
       const rosterMember = await Roster.create({
@@ -157,7 +159,7 @@ router.post('/users/create', async (req, res) => {
 
     } else if (position === 'vice_president') {
       const teamMember = await TeamMember.create({
-        name, type: 'core', role: 'Vice President',
+        name, type: 'core', role: 'Vice President', position: 'vice_president',
         github: '', linkedin: '', email: '', image: '', order: 3
       });
       const rosterMember = await Roster.create({
@@ -172,7 +174,7 @@ router.post('/users/create', async (req, res) => {
 
     } else if (position === 'web_coordinator') {
       const teamMember = await TeamMember.create({
-        name, type: 'core', role: 'Web Coordinator',
+        name, type: 'core', role: 'Web Coordinator', position: 'web_coordinator',
         github: '', linkedin: '', email: '', image: '', order: 4
       });
       const rosterMember = await Roster.create({
@@ -185,9 +187,24 @@ router.post('/users/create', async (req, res) => {
       await teamMember.save();
       await User.create({ username: cleanUsername, password, role: 'super', targetId: teamMember._id.toString() });
 
+    } else if (position === 'student_representative') {
+      const teamMember = await TeamMember.create({
+        name, type: 'core', role: 'Student Representative', position: 'student_representative',
+        github: '', linkedin: '', email: '', image: '', order: 6
+      });
+      const rosterMember = await Roster.create({
+        name, roll: 'Pending', phone: 'Pending', email: 'Pending',
+        year: '1st Year', sem: '1st Sem',
+        teamMemberId: teamMember._id.toString(),
+        github: '', linkedin: '', image: '', order: 6
+      });
+      teamMember.rosterId = rosterMember._id.toString();
+      await teamMember.save();
+      await User.create({ username: cleanUsername, password, role: 'rep', targetId: teamMember._id.toString() });
+
     } else if (position === 'faculty') {
       const teamMember = await TeamMember.create({
-        name, type: 'coordinator', role: 'Faculty Coordinator',
+        name, type: 'coordinator', role: 'Faculty Coordinator', position: 'faculty',
         github: '', linkedin: '', email: '', image: '', order: 1
       });
       const rosterMember = await Roster.create({
@@ -202,7 +219,7 @@ router.post('/users/create', async (req, res) => {
 
     } else if (position === 'core committee') {
       const teamMember = await TeamMember.create({
-        name, type: 'core', role: 'Core Committee Member',
+        name, type: 'core', role: 'Core Committee Member', position: 'core committee',
         github: '', linkedin: '', email: '', image: '', order: 5
       });
       const rosterMember = await Roster.create({
@@ -222,7 +239,7 @@ router.post('/users/create', async (req, res) => {
         github: '', linkedin: '', image: '', order: 99
       });
       const teamMember = await TeamMember.create({
-        name, type: 'member', role: 'Club Member',
+        name, type: 'member', role: 'Club Member', position: 'member',
         rosterId: rosterMember._id.toString(),
         github: '', linkedin: '', email: '', image: '', order: 99
       });
@@ -396,20 +413,45 @@ router.post('/team', async (req, res) => {
 
 router.put('/team/:id', async (req, res) => {
   try {
+    if (req.body.position) {
+      if (req.body.position === 'faculty') {
+        req.body.type = 'coordinator';
+      } else if (req.body.position === 'president') {
+        req.body.type = 'president';
+      } else if (req.body.position === 'member') {
+        req.body.type = 'member';
+      } else {
+        req.body.type = 'core';
+      }
+    }
     const member = await TeamMember.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (member && member.rosterId) {
-      await Roster.findByIdAndUpdate(member.rosterId, {
-        name: member.name,
-        email: member.email || 'Pending',
-        github: member.github || '',
-        linkedin: member.linkedin || '',
-        image: member.image || '',
-        roll: member.roll || 'Pending',
-        phone: member.phone || 'Pending',
-        year: member.year || '1st Year',
-        sem: member.sem || '1st Sem',
-        order: member.order
-      });
+    if (member) {
+      if (req.body.position) {
+        let newRole = 'core';
+        if (['president', 'vice_president', 'web_coordinator'].includes(req.body.position)) {
+          newRole = 'super';
+        } else if (req.body.position === 'student_representative') {
+          newRole = 'rep';
+        } else if (req.body.position === 'member') {
+          newRole = 'member';
+        }
+        await User.findOneAndUpdate({ targetId: member._id.toString() }, { $set: { role: newRole } });
+      }
+
+      if (member.rosterId) {
+        await Roster.findByIdAndUpdate(member.rosterId, {
+          name: member.name,
+          email: member.email || 'Pending',
+          github: member.github || '',
+          linkedin: member.linkedin || '',
+          image: member.image || '',
+          roll: member.roll || 'Pending',
+          phone: member.phone || 'Pending',
+          year: member.year || '1st Year',
+          sem: member.sem || '1st Sem',
+          order: member.order
+        });
+      }
     }
     res.json(member);
   } catch (error) {

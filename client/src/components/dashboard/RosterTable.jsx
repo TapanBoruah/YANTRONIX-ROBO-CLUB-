@@ -11,7 +11,7 @@ const RosterTable = ({ roster, loggedInUser, onEdit, onDelete }) => {
           <th className="px-6 py-4">Phone No.</th>
           <th className="px-6 py-4">Email Address</th>
           <th className="px-6 py-4">Year & Sem</th>
-          {loggedInUser?.role === 'super' && <th className="px-6 py-4">Credentials</th>}
+          {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && <th className="px-6 py-4">Credentials</th>}
           <th className="px-6 py-4 text-right">Actions</th>
         </tr>
       </thead>
@@ -25,7 +25,7 @@ const RosterTable = ({ roster, loggedInUser, onEdit, onDelete }) => {
             <td className="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">
               {m.year} / {m.sem}
             </td>
-            {loggedInUser?.role === 'super' && (
+            {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
               <td className="px-6 py-4 font-mono text-xs text-cyan-400 select-all">
                 {m.username ? `${m.username} / ${m.password}` : 'None'}
               </td>

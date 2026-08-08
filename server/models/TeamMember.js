@@ -13,6 +13,7 @@ const TeamMemberSchema = new mongoose.Schema({
   phone: { type: String },
   year: { type: String },
   sem: { type: String },
+  position: { type: String, default: 'core committee' },
   order: { type: Number, default: 99 }
 }, { timestamps: true });
 

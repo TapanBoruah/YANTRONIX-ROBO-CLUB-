@@ -12,7 +12,7 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
               <span className="text-[10px] font-mono text-cyan-400 block mb-1">FACULTY COORDINATOR</span>
               <h4 className="text-base font-bold text-white">{team.coordinator.name}</h4>
               <p className="text-xs text-gray-400">{team.coordinator.role}</p>
-              {loggedInUser?.role === 'super' && team.coordinator.username && (
+              {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && team.coordinator.username && (
                 <span className="text-[9px] font-mono text-cyan-400 select-all mt-1 block">
                   {team.coordinator.username} / {team.coordinator.password}
                 </span>
@@ -41,7 +41,7 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
               <span className="text-[10px] font-mono text-emerald-400 block mb-1">CLUB PRESIDENT</span>
               <h4 className="text-base font-bold text-white">{team.president.name}</h4>
               <p className="text-xs text-gray-400">{team.president.role}</p>
-              {loggedInUser?.role === 'super' && team.president.username && (
+              {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && team.president.username && (
                 <span className="text-[9px] font-mono text-cyan-400 select-all mt-1 block">
                   {team.president.username} / {team.president.password}
                 </span>
@@ -73,8 +73,9 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
               <tr className="bg-cyber-darker/60 border-b border-cyber-border text-xs font-mono text-cyan-400 uppercase">
                 <th className="px-4 py-3">Name</th>
                 <th className="px-4 py-3">Role</th>
+                <th className="px-4 py-3 text-center">Category</th>
                 <th className="px-4 py-3 text-center">Order</th>
-                {loggedInUser?.role === 'super' && <th className="px-4 py-3">Credentials</th>}
+                {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && <th className="px-4 py-3">Credentials</th>}
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -88,12 +89,15 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-400">{member.role}</td>
+                  <td className="px-4 py-3 text-center text-xs font-mono text-cyan-400 capitalize whitespace-nowrap">
+                    {member.position ? member.position.replace('_', ' ') : 'core committee'}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     <span className="text-xs font-mono text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
                       #{member.order ?? 99}
                     </span>
                   </td>
-                  {loggedInUser?.role === 'super' && (
+                  {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
                     <td className="px-4 py-3 font-mono text-xs text-cyan-400 select-all">
                       {member.username ? `${member.username} / ${member.password}` : 'None'}
                     </td>
@@ -116,7 +120,7 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
               ))}
               {team.core.length === 0 && (
                 <tr>
-                  <td colSpan={loggedInUser?.role === 'super' ? 4 : 3} className="px-4 py-8 text-center text-xs text-gray-500 font-mono">
+                  <td colSpan={10} className="px-4 py-8 text-center text-xs text-gray-500 font-mono">
                     No core members yet. Use "ADD NEW ITEM" to create users.
                   </td>
                 </tr>
@@ -142,7 +146,7 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
             <div key={member.id} className="flex items-start justify-between px-3 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-gray-300 font-mono">
               <span className="truncate">
                 <span>{member.name}</span>
-                {loggedInUser?.role === 'super' && member.username && (
+                {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && member.username && (
                   <span className="block text-[9px] text-cyan-400 font-mono mt-0.5 select-all">
                     {member.username} / {member.password}
                   </span>
