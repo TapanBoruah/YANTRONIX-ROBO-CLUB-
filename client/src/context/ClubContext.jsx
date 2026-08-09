@@ -1,4 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { getApiUrl } from '../utils/api';
+
+const fetch = (url, options) => globalThis.fetch(getApiUrl(url), options);
 
 export const ClubContext = createContext();
 

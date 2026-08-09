@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { ClubContext } from '../context/ClubContext';
 import { Calendar, MapPin, Tag, Video, Terminal } from 'lucide-react';
+import { getUploadsUrl } from '../utils/api';
 
 const Events = () => {
   const { events, loading } = useContext(ClubContext);
@@ -78,7 +79,7 @@ const Events = () => {
                 {}
                 <div className="relative aspect-[2.2/1] w-full overflow-hidden bg-slate-900 border-b border-cyber-border/40">
                   <img
-                    src={event.image}
+                    src={getUploadsUrl(event.image)}
                     alt={event.title}
                     className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                   />

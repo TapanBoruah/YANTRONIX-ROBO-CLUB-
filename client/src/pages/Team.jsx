@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { ClubContext } from '../context/ClubContext';
 import { Mail, Shield, GraduationCap, Award } from 'lucide-react';
+import { getUploadsUrl } from '../utils/api';
 
 const GithubIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -72,7 +73,7 @@ const Team = () => {
           <div className="glass-card p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row gap-6 items-center border-l-4 border-l-cyan-500">
             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
               {coordinator.image ? (
-                <img src={coordinator.image} alt={coordinator.name} className="w-full h-full object-cover" />
+                <img src={getUploadsUrl(coordinator.image)} alt={coordinator.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-2xl select-none">
                   {getInitials(coordinator.name)}
@@ -104,7 +105,7 @@ const Team = () => {
           <div className="glass-card p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row gap-6 items-center border-l-4 border-l-emerald-500">
             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
               {president.image ? (
-                <img src={president.image} alt={president.name} className="w-full h-full object-cover" />
+                <img src={getUploadsUrl(president.image)} alt={president.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-2xl select-none">
                   {getInitials(president.name)}
@@ -148,7 +149,7 @@ const Team = () => {
             <div key={member.id} className="glass-card p-5 rounded-xl flex flex-col items-center text-center justify-center space-y-4">
               <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative group-hover:border-cyber-glow/50 transition-colors flex items-center justify-center">
                 {member.image ? (
-                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                  <img src={getUploadsUrl(member.image)} alt={member.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xl select-none">
                     {getInitials(member.name)}
@@ -189,7 +190,7 @@ const Team = () => {
             >
               <div className="w-12 h-12 rounded-lg overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
                 {member.image ? (
-                  <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                  <img src={getUploadsUrl(member.image)} alt={member.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xs select-none">
                     {getInitials(member.name)}

@@ -5,6 +5,7 @@ import { ClubContext } from '../context/ClubContext';
 import Robot3D from '../components/animations/Robot3D';
 import DronesCanvas from '../components/animations/DronesCanvas';
 import { ArrowRight, Cpu, Code, Zap, Award, BookOpen, Calendar, HelpCircle } from 'lucide-react';
+import { getUploadsUrl } from '../utils/api';
 
 const Home = () => {
   const { projects, events, loading } = useContext(ClubContext);
@@ -186,7 +187,7 @@ const Home = () => {
                 <div key={project.id} className="glass-card rounded-2xl overflow-hidden flex flex-col text-left group">
                   <div className="relative aspect-video w-full overflow-hidden bg-slate-900 border-b border-cyber-border/40">
                     <img
-                      src={project.image}
+                      src={getUploadsUrl(project.image)}
                       alt={project.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

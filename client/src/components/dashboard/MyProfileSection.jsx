@@ -1,4 +1,5 @@
 import React from 'react';
+import { getUploadsUrl } from '../../utils/api';
 
 const MyProfileSection = ({ team, loggedInUser, onEdit, onLogout }) => {
   let profileObj = null;
@@ -58,7 +59,7 @@ const MyProfileSection = ({ team, loggedInUser, onEdit, onLogout }) => {
       <div className="glass-card p-8 rounded-2xl flex flex-col md:flex-row gap-8 items-center md:items-start border-l-4 border-l-cyber-glow">
         <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
           {profileObj.image ? (
-            <img src={profileObj.image} alt="" className="w-full h-full object-cover" />
+            <img src={getUploadsUrl(profileObj.image)} alt="" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-3xl select-none">
               {profileObj.name ? profileObj.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'Y'}

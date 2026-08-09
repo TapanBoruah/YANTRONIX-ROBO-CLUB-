@@ -1,6 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ClubContext } from '../context/ClubContext';
+import { getApiUrl } from '../utils/api';
+
+const fetch = (url, options) => globalThis.fetch(getApiUrl(url), options);
 import { 
   Shield, LogOut, LayoutGrid, Calendar, BookOpen, Users, 
   Plus, RotateCcw, ExternalLink, ClipboardList

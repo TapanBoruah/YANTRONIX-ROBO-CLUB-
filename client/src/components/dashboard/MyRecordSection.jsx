@@ -1,4 +1,5 @@
 import React from 'react';
+import { getUploadsUrl } from '../../utils/api';
 
 const MyRecordSection = ({ roster, loggedInUser, onEdit, onLogout }) => {
   const recordObj = roster.find(r => r.id === loggedInUser.id || r._id === loggedInUser.id);
@@ -43,7 +44,7 @@ const MyRecordSection = ({ roster, loggedInUser, onEdit, onLogout }) => {
       <div className="glass-card p-8 rounded-2xl border-l-4 border-l-amber-500 flex flex-col md:flex-row gap-8 items-center md:items-start">
         <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center">
           {recordObj.image ? (
-            <img src={recordObj.image} alt="" className="w-full h-full object-cover" />
+            <img src={getUploadsUrl(recordObj.image)} alt="" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-3xl select-none">
               {recordObj.name ? recordObj.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'Y'}

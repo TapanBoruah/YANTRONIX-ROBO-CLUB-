@@ -1,5 +1,6 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
+import { getUploadsUrl } from '../../utils/api';
 
 const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
   const getInitials = (name) => {
@@ -89,7 +90,7 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                   <td className="px-4 py-3 font-semibold text-white">
                     <div className="flex items-center space-x-3">
                       {member.image ? (
-                        <img src={member.image} alt="" className="w-8 h-8 rounded-full object-cover border border-cyber-border/60" />
+                        <img src={getUploadsUrl(member.image)} alt="" className="w-8 h-8 rounded-full object-cover border border-cyber-border/60" />
                       ) : (
                         <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xs select-none border border-cyber-border/60">
                           {getInitials(member.name)}

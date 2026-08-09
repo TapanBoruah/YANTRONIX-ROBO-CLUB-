@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: yantronix-server
+    env: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+        description: "MongoDB Atlas connection string"
+      - key: PORT
+        value: 5000
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+        description: "Cloudinary cloud name for uploads (optional, fallback to local storage)"
+      - key: CLOUDINARY_API_KEY
+        sync: false
+        description: "Cloudinary API key (optional)"
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+        description: "Cloudinary API secret (optional)"
