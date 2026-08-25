@@ -605,7 +605,7 @@ const DashboardModal = ({
                       </>
                     )}
 
-                    {loggedInUser?.role === 'super' && modalType === 'edit' && (
+                    {activeTab === 'team' && loggedInUser?.role === 'super' && modalType === 'edit' && (
                       <div className="space-y-1">
                         <label className="block text-xs font-mono text-gray-400 uppercase">Display Order <span className="text-gray-600">(1 = first, higher = later)</span></label>
                         <input
