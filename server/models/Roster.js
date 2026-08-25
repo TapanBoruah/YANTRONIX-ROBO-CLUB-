@@ -11,7 +11,9 @@ const RosterSchema = new mongoose.Schema({
   github: { type: String, default: '' },
   linkedin: { type: String, default: '' },
   image: { type: String, default: '' },
-  order: { type: Number, default: 99 }
+  order: { type: Number, default: 99 },
+  startDate: { type: String, default: '' },
+  endDate: { type: String, default: 'Present' }
 }, { timestamps: true });
 
 export default mongoose.model('Roster', RosterSchema);

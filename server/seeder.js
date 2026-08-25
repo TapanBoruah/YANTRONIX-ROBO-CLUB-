@@ -6,6 +6,7 @@ import Glossary from './models/Glossary.js';
 import TeamMember from './models/TeamMember.js';
 import Roster from './models/Roster.js';
 import User from './models/User.js';
+import Gallery from './models/Gallery.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ const seedDB = async () => {
     await TeamMember.deleteMany({});
     await Roster.deleteMany({});
     await User.deleteMany({});
+    await Gallery.deleteMany({});
     console.log('Collections cleared.');
 
 
@@ -39,6 +41,13 @@ const seedDB = async () => {
 
     const glossary = await Glossary.insertMany(defaultGlossary);
     console.log(`Seeded ${glossary.length} Glossary entries.`);
+
+    console.log('Seeding default gallery items...');
+    const defaultGalleryItems = [
+  
+    ];
+    await Gallery.insertMany(defaultGalleryItems);
+    console.log('Seeded gallery items.');
 
     const team = await TeamMember.insertMany(defaultTeam);
     console.log(`Seeded ${team.length} Team members.`);
@@ -63,7 +72,9 @@ const seedDB = async () => {
         type: admin.type,
         role: admin.role,
         position: admin.position,
-        github: '', linkedin: '', email: '', image: '', order: admin.order
+        github: '', linkedin: '', email: '', image: '', order: admin.order,
+        startDate: '2024-08-01',
+        endDate: 'Present'
       });
 
       const rosterMember = await Roster.create({
@@ -71,7 +82,9 @@ const seedDB = async () => {
         roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
         teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: admin.order
+        github: '', linkedin: '', image: '', order: admin.order,
+        startDate: '2024-08-01',
+        endDate: 'Present'
       });
 
       teamMember.rosterId = rosterMember._id.toString();

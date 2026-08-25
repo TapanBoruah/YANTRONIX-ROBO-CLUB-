@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { ClubContext } from '../context/ClubContext';
 import Robot3D from '../components/animations/Robot3D';
 import DronesCanvas from '../components/animations/DronesCanvas';
-import { ArrowRight, Cpu, Code, Zap, Award, BookOpen, Calendar, HelpCircle } from 'lucide-react';
+import { ArrowRight, Cpu, Code, Zap, Award, BookOpen, Calendar, HelpCircle, Image as ImageIcon } from 'lucide-react';
 import { getUploadsUrl } from '../utils/api';
 
 const Home = () => {
-  const { projects, events, loading } = useContext(ClubContext);
+  const { projects, events, gallery, loading } = useContext(ClubContext);
 
   
   const featuredProjects = projects.slice(0, 3);
@@ -254,8 +254,16 @@ const Home = () => {
               </div>
             ) : (
               upcomingEvents.map((event) => (
-                <div key={event.id} className="glass-card p-6 rounded-2xl flex flex-col sm:flex-row gap-6 items-start sm:items-center text-left border-l-4 border-l-cyber-glow">
-                  <div className="flex-grow space-y-2">
+                <div key={event.id} className="glass-card overflow-hidden rounded-2xl flex flex-col sm:flex-row gap-6 items-stretch text-left border-l-4 border-l-cyber-glow group">
+                  <div className="relative w-full sm:w-48 h-36 sm:h-auto overflow-hidden bg-slate-900 flex-shrink-0">
+                    <img
+                      src={getUploadsUrl(event.image)}
+                      alt={event.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-cyber-card/30 opacity-70"></div>
+                  </div>
+                  <div className="p-6 sm:pl-0 flex-grow space-y-2 flex flex-col justify-center">
                     <div className="flex items-center space-x-2 text-xs font-mono text-cyber-glow">
                       <Calendar className="w-3.5 h-3.5" />
                       <span>{event.date}</span>
@@ -264,13 +272,81 @@ const Home = () => {
                         {event.type}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold font-sans text-white">{event.title}</h3>
-                    <p className="text-xs text-gray-400 leading-relaxed">{event.description}</p>
+                    <h3 className="text-lg font-bold font-sans text-white group-hover:text-cyber-glow transition-colors duration-300">
+                      {event.title}
+                    </h3>
+                    <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{event.description}</p>
                     <p className="text-[10px] font-mono text-gray-500">Venue: {event.location}</p>
                   </div>
                 </div>
               ))
             )}
+          </div>
+
+        </div>
+      </section>
+
+      {/* Gallery Carousel Section */}
+      <section className="border-t border-cyber-border/40 py-20 relative overflow-hidden bg-cyber-darker/20">
+        <div className="absolute inset-0 grid-overlay opacity-5 pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
+          
+          <div className="space-y-2">
+            <h2 className="text-xs font-mono tracking-widest text-cyber-glow uppercase">Visual Feed</h2>
+            <h3 className="text-3xl font-bold font-sans">Yantronix Gallery</h3>
+            <p className="text-sm text-gray-400 max-w-xl mx-auto leading-relaxed">
+              Explore snapshots of robotics builds, coding sessions, and event activities inside NIT AP.
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="py-12 flex flex-col items-center justify-center space-y-4">
+              <div className="w-10 h-10 rounded-full border-4 border-cyber-glow/20 border-t-cyber-glow animate-spin"></div>
+              <p className="text-sm font-mono text-cyan-400 animate-pulse tracking-wider">RETRIEVING GALLERY...</p>
+            </div>
+          ) : gallery.length === 0 ? (
+            <div className="py-12 text-center glass-card max-w-md mx-auto rounded-2xl flex flex-col items-center justify-center space-y-4 border border-cyber-border/20">
+              <ImageIcon className="w-12 h-12 text-cyan-400 animate-pulse" />
+              <div>
+                <h4 className="text-base font-bold text-white font-mono uppercase">Gallery Coming Soon</h4>
+                <p className="text-xs text-gray-500 max-w-xs mt-1 mx-auto leading-relaxed">Images are being calibrated. Visual feeds will be online shortly.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full relative overflow-hidden py-4 select-none">
+              {/* Marquee Row */}
+              <div className="flex w-[200%] gap-6 animate-marquee hover:[animation-play-state:paused]">
+                {/* Render items twice for infinite scroll effect */}
+                {[...gallery, ...gallery].map((item, idx) => (
+                  <Link
+                    key={`${item.id}-${idx}`}
+                    to="/gallery"
+                    className="w-72 aspect-square flex-shrink-0 rounded-xl overflow-hidden glass-card border border-cyber-border/40 hover:border-cyber-glow/50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all duration-300 relative group animate-pulse-slow"
+                  >
+                    <img
+                      src={getUploadsUrl(item.image)}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 text-left">
+                      <h4 className="text-xs font-bold text-cyber-glow font-mono uppercase truncate">{item.title}</h4>
+                      {item.description && (
+                        <p className="text-[10px] text-gray-400 truncate mt-0.5">{item.description}</p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="pt-4">
+            <Link
+              to="/gallery"
+              className="inline-flex items-center space-x-1.5 px-6 py-2.5 rounded border border-cyber-glow text-cyber-glow text-xs font-mono font-semibold hover:bg-cyber-glow hover:text-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.35)]"
+            >
+              <span>ACCESS FULL ARCHIVE</span>
+            </Link>
           </div>
 
         </div>

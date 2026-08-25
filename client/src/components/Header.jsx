@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Cpu, Users, Calendar, BookOpen, Shield, LogOut } from 'lucide-react';
+import { Menu, X, Cpu, Users, Calendar, BookOpen, Shield, LogOut, Image } from 'lucide-react';
 import { ClubContext } from '../context/ClubContext';
 
 const Header = () => {
@@ -15,6 +15,7 @@ const Header = () => {
     { name: 'Glossary', href: '/glossary', icon: BookOpen },
     { name: 'Events', href: '/events', icon: Calendar },
     { name: 'Team', href: '/team', icon: Users },
+    { name: 'Gallery', href: '/gallery', icon: Image },
   ];
 
   const isActive = (path) => location.pathname === path;

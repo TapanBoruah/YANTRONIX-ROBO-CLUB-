@@ -27,3 +27,22 @@ export const getUploadsUrl = (path) => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   return `${API_BASE_URL}${cleanPath}`;
 };
+
+/**
+ * Formats YYYY-MM-DD date strings into human-readable text (e.g., Aug 2024).
+ * @param {string} dateStr - The date string to format.
+ * @returns {string} - The formatted date string.
+ */
+export const formatDate = (dateStr) => {
+  if (!dateStr) return 'N/A';
+  if (dateStr.toLowerCase() === 'present') return 'Present';
+  
+  // Date constructor might parse YYYY-MM-DD as UTC. To avoid timezone shifting,
+  // we can append a time or replace dashes to avoid midnight UTC offsets if needed,
+  // but standard new Date(dateStr) is generally fine for month/year representation.
+  const parsed = new Date(dateStr);
+  if (!isNaN(parsed)) {
+    return parsed.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  }
+  return dateStr;
+};

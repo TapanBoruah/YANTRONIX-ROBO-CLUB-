@@ -1,6 +1,6 @@
 import React from 'react';
-import { Edit, Trash2 } from 'lucide-react';
-import { getUploadsUrl } from '../../utils/api';
+import { Edit, RotateCcw } from 'lucide-react';
+import { getUploadsUrl, formatDate } from '../../utils/api';
 
 const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
   const getInitials = (name) => {
@@ -30,12 +30,6 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
               >
                 <Edit className="w-4 h-4" />
               </button>
-              <button
-                onClick={() => onDelete(team.coordinator._id || team.coordinator.id, team.coordinator.name, 'core')}
-                className="p-2 rounded border border-red-500/10 hover:border-red-500/50 text-gray-500 hover:text-red-400 transition-all"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
             </div>
           </div>
         )}
@@ -58,12 +52,6 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                 className="p-2 rounded border border-cyber-border hover:border-cyber-glow/50 text-gray-400 hover:text-cyber-glow transition-all"
               >
                 <Edit className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => onDelete(team.president._id || team.president.id, team.president.name, 'core')}
-                className="p-2 rounded border border-red-500/10 hover:border-red-500/50 text-gray-500 hover:text-red-400 transition-all"
-              >
-                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -113,18 +101,12 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                       {member.username ? `${member.username} / ${member.password}` : 'None'}
                     </td>
                   )}
-                  <td className="px-4 py-3 text-right space-x-2">
+                  <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => onEdit({ ...member, type: member.type || 'core' })}
                       className="p-1 rounded border border-cyber-border hover:border-cyber-glow/50 text-gray-400 hover:text-cyber-glow"
                     >
                       <Edit className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => onDelete(member.id, null, 'core')}
-                      className="p-1 rounded border border-red-500/10 hover:border-red-500/50 text-gray-500 hover:text-red-400"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </td>
                 </tr>
@@ -164,11 +146,11 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                 )}
               </span>
               <button
-                onClick={() => onDelete(member.id, member.name, 'members')}
-                className="text-gray-500 hover:text-red-400 font-mono text-[10px] ml-2 mt-0.5 focus:outline-none flex-shrink-0"
-                title="Remove member"
+                onClick={() => onEdit({ ...member, type: 'member' })}
+                className="text-gray-500 hover:text-cyber-glow font-mono text-[10px] ml-2 mt-0.5 focus:outline-none flex-shrink-0"
+                title="Edit member"
               >
-                &times;
+                Edit
               </button>
             </div>
           ))}
@@ -177,6 +159,63 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
           )}
         </div>
       </div>
+
+      {team.past && team.past.length > 0 && (
+        <div className="space-y-3 pt-6 border-t border-cyber-border/20">
+          <div className="flex items-center space-x-2">
+            <RotateCcw className="w-4 h-4 text-cyan-500" />
+            <h4 className="text-xs font-mono tracking-wider text-cyan-500 uppercase">Past Members & Alumni</h4>
+          </div>
+          <div className="overflow-x-auto border border-cyber-border/40 rounded-lg">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-cyber-darker/60 border-b border-cyber-border text-xs font-mono text-cyan-400 uppercase">
+                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">Role</th>
+                  <th className="px-4 py-3 text-center">Duration</th>
+                  {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && <th className="px-4 py-3">Credentials Status</th>}
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-cyber-border/40 text-sm">
+                {team.past.map((member) => (
+                  <tr key={member.id} className="hover:bg-cyber-darker/30 transition-colors opacity-75 hover:opacity-100">
+                    <td className="px-4 py-3 font-semibold text-white">
+                      <div className="flex items-center space-x-3">
+                        {member.image ? (
+                          <img src={getUploadsUrl(member.image)} alt="" className="w-8 h-8 rounded-full object-cover border border-cyber-border/60" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xs select-none border border-cyber-border/60">
+                            {getInitials(member.name)}
+                          </div>
+                        )}
+                        <span>{member.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-400">{member.role}</td>
+                    <td className="px-4 py-3 text-center text-xs font-mono text-cyan-400">
+                      {formatDate(member.startDate)} - {formatDate(member.endDate)}
+                    </td>
+                    {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
+                      <td className="px-4 py-3 font-mono text-xs text-red-400/80">
+                        Login Disabled (Past Member)
+                      </td>
+                    )}
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => onEdit({ ...member, type: member.type || 'core' })}
+                        className="p-1 rounded border border-cyber-border hover:border-cyber-glow/50 text-gray-400 hover:text-cyber-glow"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
     </div>
   );

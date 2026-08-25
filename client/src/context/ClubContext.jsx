@@ -13,9 +13,11 @@ export const ClubProvider = ({ children }) => {
     coordinator: null,
     president: null,
     core: [],
-    members: []
+    members: [],
+    past: []
   });
   const [roster, setRoster] = useState([]);
+  const [gallery, setGallery] = useState([]);
 
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
     return localStorage.getItem('yantronix_admin_auth') === 'true';
@@ -33,12 +35,13 @@ export const ClubProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      const [projRes, evtsRes, glossRes, teamRes, rostRes] = await Promise.all([
+      const [projRes, evtsRes, glossRes, teamRes, rostRes, gallRes] = await Promise.all([
         fetch('/api/projects').then(res => res.json()),
         fetch('/api/events').then(res => res.json()),
         fetch('/api/glossary').then(res => res.json()),
         fetch('/api/team').then(res => res.json()),
-        fetch('/api/roster').then(res => res.json())
+        fetch('/api/roster').then(res => res.json()),
+        fetch('/api/gallery').then(res => res.json())
       ]);
 
       const mapDoc = (doc) => ({ ...doc, id: doc._id });
@@ -47,17 +50,41 @@ export const ClubProvider = ({ children }) => {
       setEvents(evtsRes.map(mapDoc));
       setGlossary(glossRes.map(mapDoc));
       setRoster(rostRes.map(mapDoc));
+      setGallery(gallRes.map(mapDoc));
 
       
       const flatTeam = teamRes;
-      const coordinatorDoc = flatTeam.find(t => t.type === 'coordinator');
-      const presidentDoc = flatTeam.find(t => t.type === 'president');
+      const isPastMember = (m) => {
+        if (!m.endDate) return false;
+        const cleanEnd = m.endDate.trim().toLowerCase();
+        if (cleanEnd === '' || cleanEnd === 'present' || cleanEnd === 'till present') {
+          return false;
+        }
+
+        const endDateTime = Date.parse(m.endDate);
+        if (!isNaN(endDateTime)) {
+          return endDateTime < Date.now();
+        }
+
+        const yearRegex = /^[12][0-9]{3}$/;
+        if (yearRegex.test(m.endDate.trim())) {
+          const endYear = parseInt(m.endDate.trim());
+          const currentYear = new Date().getFullYear();
+          return endYear < currentYear;
+        }
+
+        return true;
+      };
+
+      const coordinatorDoc = flatTeam.find(t => t.type === 'coordinator' && !isPastMember(t));
+      const presidentDoc = flatTeam.find(t => t.type === 'president' && !isPastMember(t));
 
       const structuredTeam = {
         coordinator: coordinatorDoc ? { ...coordinatorDoc, id: coordinatorDoc._id } : null,
         president: presidentDoc ? { ...presidentDoc, id: presidentDoc._id } : null,
-        core: flatTeam.filter(t => t.type === 'core').map(mapDoc),
-        members: flatTeam.filter(t => t.type === 'member').map(mapDoc)
+        core: flatTeam.filter(t => t.type === 'core' && !isPastMember(t)).map(mapDoc),
+        members: flatTeam.filter(t => t.type === 'member' && !isPastMember(t)).map(mapDoc),
+        past: flatTeam.filter(t => isPastMember(t)).map(mapDoc)
       };
       setTeam(structuredTeam);
     } catch (error) {
@@ -306,6 +333,41 @@ export const ClubProvider = ({ children }) => {
     }
   };
 
+  const addGallery = async (item) => {
+    try {
+      await fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      });
+      await fetchAllData();
+    } catch (error) {
+      console.error('Failed to add gallery item:', error);
+    }
+  };
+  const updateGallery = async (id, updated) => {
+    try {
+      await fetch(`/api/gallery/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+      await fetchAllData();
+    } catch (error) {
+      console.error('Failed to update gallery item:', error);
+    }
+  };
+  const deleteGallery = async (id) => {
+    try {
+      await fetch(`/api/gallery/${id}`, {
+        method: 'DELETE'
+      });
+      await fetchAllData();
+    } catch (error) {
+      console.error('Failed to delete gallery item:', error);
+    }
+  };
+
   const createUser = async (userPayload) => {
     try {
       const response = await fetch('/api/users/create', {
@@ -347,13 +409,14 @@ export const ClubProvider = ({ children }) => {
 
   return (
     <ClubContext.Provider value={{
-      projects, events, glossary, team, roster, isAdminLoggedIn, loggedInUser, loading,
+      projects, events, glossary, team, roster, gallery, isAdminLoggedIn, loggedInUser, loading,
       login, logout,
       addProject, updateProject, deleteProject,
       addEvent, updateEvent, deleteEvent,
       addGlossary, updateGlossary, deleteGlossary,
       addTeamMember, updateTeamMember, deleteTeamMember,
       addRosterMember, updateRosterMember, deleteRosterMember,
+      addGallery, updateGallery, deleteGallery,
       createUser, updateCredentials
     }}>
       {children}

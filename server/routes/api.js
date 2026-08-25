@@ -15,6 +15,7 @@ import Glossary from '../models/Glossary.js';
 import TeamMember from '../models/TeamMember.js';
 import Roster from '../models/Roster.js';
 import User from '../models/User.js';
+import Gallery from '../models/Gallery.js';
 import { defaultProjects, defaultEvents, defaultGlossary, defaultTeam, defaultRoster } from '../mockData.js';
 
 dotenv.config();
@@ -92,6 +93,33 @@ router.post('/auth/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid access credentials.' });
     }
 
+    const member = await TeamMember.findOne({
+      $or: [
+        { _id: user.targetId },
+        { rosterId: user.targetId }
+      ]
+    });
+    if (member && member.endDate) {
+      const cleanEnd = member.endDate.trim().toLowerCase();
+      if (cleanEnd !== '' && cleanEnd !== 'present' && cleanEnd !== 'till present') {
+        let isPast = true;
+        const endDateTime = Date.parse(member.endDate);
+        if (!isNaN(endDateTime)) {
+          isPast = endDateTime < Date.now();
+        } else {
+          const yearRegex = /^[12][0-9]{3}$/;
+          if (yearRegex.test(member.endDate.trim())) {
+            const endYear = parseInt(member.endDate.trim());
+            const currentYear = new Date().getFullYear();
+            isPast = endYear < currentYear;
+          }
+        }
+        if (isPast) {
+          return res.status(403).json({ message: 'Access denied. User account is disabled for past members.' });
+        }
+      }
+    }
+
     return res.json({
       role: user.role,
       name: user.username.toUpperCase(),
@@ -157,13 +185,15 @@ router.post('/users/create', async (req, res) => {
     if (position === 'president') {
       const teamMember = await TeamMember.create({
         name, type: 'president', role: 'Club President', position: 'president',
-        github: '', linkedin: '', email: '', image: '', order: 2
+        github: '', linkedin: '', email: '', image: '', order: 2,
+        startDate: '', endDate: 'Present'
       });
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
         teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: 2
+        github: '', linkedin: '', image: '', order: 2,
+        startDate: '', endDate: 'Present'
       });
       teamMember.rosterId = rosterMember._id.toString();
       await teamMember.save();
@@ -172,13 +202,15 @@ router.post('/users/create', async (req, res) => {
     } else if (position === 'vice_president') {
       const teamMember = await TeamMember.create({
         name, type: 'core', role: 'Vice President', position: 'vice_president',
-        github: '', linkedin: '', email: '', image: '', order: 3
+        github: '', linkedin: '', email: '', image: '', order: 3,
+        startDate: '', endDate: 'Present'
       });
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
         teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: 3
+        github: '', linkedin: '', image: '', order: 3,
+        startDate: '', endDate: 'Present'
       });
       teamMember.rosterId = rosterMember._id.toString();
       await teamMember.save();
@@ -187,13 +219,15 @@ router.post('/users/create', async (req, res) => {
     } else if (position === 'web_coordinator') {
       const teamMember = await TeamMember.create({
         name, type: 'core', role: 'Web Coordinator', position: 'web_coordinator',
-        github: '', linkedin: '', email: '', image: '', order: 4
+        github: '', linkedin: '', email: '', image: '', order: 4,
+        startDate: '', endDate: 'Present'
       });
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
         teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: 4
+        github: '', linkedin: '', image: '', order: 4,
+        startDate: '', endDate: 'Present'
       });
       teamMember.rosterId = rosterMember._id.toString();
       await teamMember.save();
@@ -202,13 +236,15 @@ router.post('/users/create', async (req, res) => {
     } else if (position === 'student_representative') {
       const teamMember = await TeamMember.create({
         name, type: 'core', role: 'Student Representative', position: 'student_representative',
-        github: '', linkedin: '', email: '', image: '', order: 6
+        github: '', linkedin: '', email: '', image: '', order: 6,
+        startDate: '', endDate: 'Present'
       });
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
         teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: 6
+        github: '', linkedin: '', image: '', order: 6,
+        startDate: '', endDate: 'Present'
       });
       teamMember.rosterId = rosterMember._id.toString();
       await teamMember.save();
@@ -217,13 +253,15 @@ router.post('/users/create', async (req, res) => {
     } else if (position === 'faculty') {
       const teamMember = await TeamMember.create({
         name, type: 'coordinator', role: 'Faculty Coordinator', position: 'faculty',
-        github: '', linkedin: '', email: '', image: '', order: 1
+        github: '', linkedin: '', email: '', image: '', order: 1,
+        startDate: '', endDate: 'Present'
       });
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
         teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: 1
+        github: '', linkedin: '', image: '', order: 1,
+        startDate: '', endDate: 'Present'
       });
       teamMember.rosterId = rosterMember._id.toString();
       await teamMember.save();
@@ -232,13 +270,15 @@ router.post('/users/create', async (req, res) => {
     } else if (position === 'core committee') {
       const teamMember = await TeamMember.create({
         name, type: 'core', role: 'Core Committee Member', position: 'core committee',
-        github: '', linkedin: '', email: '', image: '', order: 5
+        github: '', linkedin: '', email: '', image: '', order: 5,
+        startDate: '', endDate: 'Present'
       });
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
         teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: 5
+        github: '', linkedin: '', image: '', order: 5,
+        startDate: '', endDate: 'Present'
       });
       teamMember.rosterId = rosterMember._id.toString();
       await teamMember.save();
@@ -248,12 +288,14 @@ router.post('/users/create', async (req, res) => {
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
-        github: '', linkedin: '', image: '', order: 99
+        github: '', linkedin: '', image: '', order: 99,
+        startDate: '', endDate: 'Present'
       });
       const teamMember = await TeamMember.create({
         name, type: 'member', role: 'Club Member', position: 'member',
         rosterId: rosterMember._id.toString(),
-        github: '', linkedin: '', email: '', image: '', order: 99
+        github: '', linkedin: '', email: '', image: '', order: 99,
+        startDate: '', endDate: 'Present'
       });
       rosterMember.teamMemberId = teamMember._id.toString();
       await rosterMember.save();
@@ -345,6 +387,46 @@ router.delete('/events/:id', async (req, res) => {
   try {
     await Event.findByIdAndDelete(req.params.id);
     res.json({ message: 'Event deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+
+router.get('/gallery', async (req, res) => {
+  try {
+    const items = await Gallery.find().sort({ createdAt: -1 });
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/gallery', async (req, res) => {
+  try {
+    const item = new Gallery(req.body);
+    await item.save();
+    res.status(201).json(item);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.put('/gallery/:id', async (req, res) => {
+  try {
+    const item = await Gallery.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(item);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.delete('/gallery/:id', async (req, res) => {
+  try {
+    await Gallery.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Gallery item deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -461,7 +543,9 @@ router.put('/team/:id', async (req, res) => {
           phone: member.phone || 'Pending',
           year: member.year || '1st Year',
           sem: member.sem || '1st Sem',
-          order: member.order
+          order: member.order,
+          startDate: member.startDate || '',
+          endDate: member.endDate || 'Present'
         });
       }
     }
@@ -546,7 +630,9 @@ router.put('/roster/:id', async (req, res) => {
         roll: student.roll || 'Pending',
         phone: student.phone || 'Pending',
         year: student.year || '1st Year',
-        sem: student.sem || '1st Sem'
+        sem: student.sem || '1st Sem',
+        startDate: student.startDate || '',
+        endDate: student.endDate || 'Present'
       });
     }
     res.json(student);

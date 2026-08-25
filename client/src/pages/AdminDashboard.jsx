@@ -6,7 +6,7 @@ import { getApiUrl } from '../utils/api';
 const fetch = (url, options) => globalThis.fetch(getApiUrl(url), options);
 import { 
   Shield, LogOut, LayoutGrid, Calendar, BookOpen, Users, 
-  Plus, RotateCcw, ExternalLink, ClipboardList
+  Plus, RotateCcw, ExternalLink, ClipboardList, Image
 } from 'lucide-react';
 
 
@@ -17,16 +17,18 @@ import RosterTable from '../components/dashboard/RosterTable';
 import TeamSection from '../components/dashboard/TeamSection';
 import MyProfileSection from '../components/dashboard/MyProfileSection';
 import MyRecordSection from '../components/dashboard/MyRecordSection';
+import GalleryTable from '../components/dashboard/GalleryTable';
 import DashboardModal from '../components/dashboard/DashboardModal';
 
 const AdminDashboard = () => {
   const { 
-    projects, events, glossary, team, roster, isAdminLoggedIn, loggedInUser, logout,
+    projects, events, glossary, team, roster, gallery, isAdminLoggedIn, loggedInUser, logout,
     addProject, updateProject, deleteProject,
     addEvent, updateEvent, deleteEvent,
     addGlossary, updateGlossary, deleteGlossary,
     addTeamMember, updateTeamMember, deleteTeamMember,
     addRosterMember, updateRosterMember, deleteRosterMember,
+    addGallery, updateGallery, deleteGallery,
     createUser, loading, updateCredentials
   } = useContext(ClubContext);
 
@@ -42,6 +44,7 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState({});
   const [workingStepInput, setWorkingStepInput] = useState(''); 
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   
   useEffect(() => {
@@ -138,6 +141,8 @@ const AdminDashboard = () => {
         return { name: '', username: '', password: '', position: 'core committee' };
       case 'roster':
         return { name: '', roll: '', phone: '', email: '', year: '1st Year', sem: '1st Sem' };
+      case 'gallery':
+        return { title: '', image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80', description: '' };
       default:
         return {};
     }
@@ -146,69 +151,82 @@ const AdminDashboard = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
+    try {
+      if (activeTab === 'projects') {
+        const processedTags = typeof formData.tags === 'string' 
+          ? formData.tags.split(',').map(t => t.trim()).filter(Boolean)
+          : formData.tags;
 
-    if (activeTab === 'projects') {
-      const processedTags = typeof formData.tags === 'string' 
-        ? formData.tags.split(',').map(t => t.trim()).filter(Boolean)
-        : formData.tags;
+        const projectPayload = { ...formData, tags: processedTags };
 
-      const projectPayload = { ...formData, tags: processedTags };
-
-      if (modalType === 'add') {
-        await addProject(projectPayload);
-      } else {
-        await updateProject(editId, projectPayload);
-      }
-    } 
-    else if (activeTab === 'events') {
-      if (modalType === 'add') {
-        await addEvent(formData);
-      } else {
-        await updateEvent(editId, formData);
-      }
-    } 
-    else if (activeTab === 'glossary') {
-      if (modalType === 'add') {
-        await addGlossary(formData);
-      } else {
-        await updateGlossary(editId, formData);
-      }
-    } 
-    else if (activeTab === 'team' || activeTab === 'my_profile') {
-      if (modalType === 'add') {
-        const res = await createUser(formData);
-        if (!res.success) {
-          alert(res.message);
-          return;
+        if (modalType === 'add') {
+          await addProject(projectPayload);
+        } else {
+          await updateProject(editId, projectPayload);
         }
-      } else {
-        const memberType = formData.type || 'core';
-        await updateTeamMember(editId, formData, memberType);
+      } 
+      else if (activeTab === 'events') {
+        if (modalType === 'add') {
+          await addEvent(formData);
+        } else {
+          await updateEvent(editId, formData);
+        }
+      } 
+      else if (activeTab === 'glossary') {
+        if (modalType === 'add') {
+          await addGlossary(formData);
+        } else {
+          await updateGlossary(editId, formData);
+        }
+      } 
+      else if (activeTab === 'team' || activeTab === 'my_profile') {
+        if (modalType === 'add') {
+          const res = await createUser(formData);
+          if (!res.success) {
+            alert(res.message);
+            return;
+          }
+        } else {
+          const memberType = formData.type || 'core';
+          await updateTeamMember(editId, formData, memberType);
 
-        if (activeTab === 'my_profile' && (formData.newUsername || formData.newPassword)) {
-          const credRes = await updateCredentials(loggedInUser.id, formData.newUsername, formData.newPassword);
-          if (!credRes.success) {
-            alert('Profile saved, but credential update failed: ' + credRes.message);
+          if (activeTab === 'my_profile' && (formData.newUsername || formData.newPassword)) {
+            const credRes = await updateCredentials(loggedInUser.id, formData.newUsername, formData.newPassword);
+            if (!credRes.success) {
+              alert('Profile saved, but credential update failed: ' + credRes.message);
+            }
           }
         }
       }
-    }
-    else if (activeTab === 'roster' || activeTab === 'my_record') {
-      if (modalType === 'add') {
-        addRosterMember(formData);
-      } else {
-        await updateRosterMember(editId, formData);
+      else if (activeTab === 'roster' || activeTab === 'my_record') {
+        if (modalType === 'add') {
+          await addRosterMember(formData);
+        } else {
+          await updateRosterMember(editId, formData);
 
-        if (activeTab === 'my_record' && (formData.newUsername || formData.newPassword)) {
-          const credRes = await updateCredentials(loggedInUser.id, formData.newUsername, formData.newPassword);
-          if (!credRes.success) {
-            alert('Profile saved, but credential update failed: ' + credRes.message);
+          if (activeTab === 'my_record' && (formData.newUsername || formData.newPassword)) {
+            const credRes = await updateCredentials(loggedInUser.id, formData.newUsername, formData.newPassword);
+            if (!credRes.success) {
+              alert('Profile saved, but credential update failed: ' + credRes.message);
+            }
           }
         }
       }
+      else if (activeTab === 'gallery') {
+        if (modalType === 'add') {
+          await addGallery(formData);
+        } else {
+          await updateGallery(editId, formData);
+        }
+      }
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Failed to save changes:', error);
+      alert('Error saving changes');
+    } finally {
+      setIsSaving(false);
     }
-
-    setIsModalOpen(false);
   };
 
   const handleDelete = (id, name, type) => {
@@ -224,8 +242,31 @@ const AdminDashboard = () => {
       deleteTeamMember(id, name, type);
     } else if (activeTab === 'roster') {
       deleteRosterMember(id);
+    } else if (activeTab === 'gallery') {
+      deleteGallery(id);
     }
   };
+
+  const isPastDate = (dateStr) => {
+    if (!dateStr) return false;
+    const cleanEnd = dateStr.trim().toLowerCase();
+    if (cleanEnd === '' || cleanEnd === 'present' || cleanEnd === 'till present') {
+      return false;
+    }
+    const endDateTime = Date.parse(dateStr);
+    if (!isNaN(endDateTime)) {
+      return endDateTime < Date.now();
+    }
+    const yearRegex = /^[12][0-9]{3}$/;
+    if (yearRegex.test(dateStr.trim())) {
+      const endYear = parseInt(dateStr.trim());
+      const currentYear = new Date().getFullYear();
+      return endYear < currentYear;
+    }
+    return false;
+  };
+
+  const activeRoster = roster.filter(m => !isPastDate(m.endDate));
 
   return (
     <div className="min-h-screen bg-cyber-bg flex flex-col relative text-left">
@@ -290,6 +331,15 @@ const AdminDashboard = () => {
                   >
                     <BookOpen className="w-4 h-4" />
                     <span>Manage Glossary</span>
+                  </button>
+                  <button
+                    onClick={() => handleTabChange('gallery')}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      activeTab === 'gallery' ? 'bg-cyber-glow/15 text-cyber-glow border-l-2 border-cyber-glow' : 'text-gray-400 hover:text-gray-200 hover:bg-cyber-card/50'
+                    }`}
+                  >
+                    <Image className="w-4 h-4" />
+                    <span>Manage Gallery</span>
                   </button>
                 </>
               )}
@@ -389,7 +439,11 @@ const AdminDashboard = () => {
               )}
 
               {activeTab === 'roster' && (
-                <RosterTable roster={roster} loggedInUser={loggedInUser} onEdit={openEditModal} onDelete={handleDelete} />
+                <RosterTable roster={activeRoster} loggedInUser={loggedInUser} onEdit={openEditModal} onDelete={handleDelete} />
+              )}
+
+              {activeTab === 'gallery' && (
+                <GalleryTable gallery={gallery} onEdit={openEditModal} onDelete={handleDelete} />
               )}
 
               {activeTab === 'my_profile' && (
@@ -423,6 +477,7 @@ const AdminDashboard = () => {
         workingStepInput={workingStepInput}
         setWorkingStepInput={setWorkingStepInput}
         loggedInUser={loggedInUser}
+        isSaving={isSaving}
       />
     </div>
   );

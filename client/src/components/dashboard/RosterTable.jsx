@@ -1,7 +1,8 @@
 import React from 'react';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit } from 'lucide-react';
+import { formatDate } from '../../utils/api';
 
-const RosterTable = ({ roster, loggedInUser, onEdit, onDelete }) => {
+const RosterTable = ({ roster, loggedInUser, onEdit }) => {
   return (
     <table className="w-full text-left border-collapse min-w-[700px]">
       <thead>
@@ -11,6 +12,7 @@ const RosterTable = ({ roster, loggedInUser, onEdit, onDelete }) => {
           <th className="px-6 py-4">Phone No.</th>
           <th className="px-6 py-4">Email Address</th>
           <th className="px-6 py-4">Year & Sem</th>
+          <th className="px-6 py-4">Duration</th>
           {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && <th className="px-6 py-4">Credentials</th>}
           <th className="px-6 py-4 text-right">Actions</th>
         </tr>
@@ -25,25 +27,21 @@ const RosterTable = ({ roster, loggedInUser, onEdit, onDelete }) => {
             <td className="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">
               {m.year} / {m.sem}
             </td>
+            <td className="px-6 py-4 text-xs font-mono text-cyan-400 whitespace-nowrap">
+              {formatDate(m.startDate)} - {formatDate(m.endDate)}
+            </td>
             {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
               <td className="px-6 py-4 font-mono text-xs text-cyan-400 select-all">
                 {m.username ? `${m.username} / ${m.password}` : 'None'}
               </td>
             )}
-            <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+            <td className="px-6 py-4 text-right whitespace-nowrap">
               <button
                 onClick={() => onEdit(m)}
                 className="p-1.5 rounded border border-cyber-border hover:border-cyber-glow/50 text-gray-400 hover:text-cyber-glow transition-all"
                 title="Edit"
               >
                 <Edit className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => onDelete(m.id)}
-                className="p-1.5 rounded border border-red-500/10 hover:border-red-500/50 text-gray-500 hover:text-red-400 transition-all"
-                title="Delete"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </td>
           </tr>

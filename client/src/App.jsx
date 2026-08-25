@@ -9,6 +9,7 @@ import Team from './pages/Team';
 import Events from './pages/Events';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
+import Gallery from './pages/Gallery';
 
 function AppContent() {
   return (
@@ -32,6 +33,7 @@ function AppContent() {
                   <Route path="/glossary" element={<Glossary />} />
                   <Route path="/team" element={<Team />} />
                   <Route path="/events" element={<Events />} />
+                  <Route path="/gallery" element={<Gallery />} />
                 </Routes>
               </main>
               <Footer />

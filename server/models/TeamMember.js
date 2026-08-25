@@ -14,7 +14,9 @@ const TeamMemberSchema = new mongoose.Schema({
   year: { type: String },
   sem: { type: String },
   position: { type: String, default: 'core committee' },
-  order: { type: Number, default: 99 }
+  order: { type: Number, default: 99 },
+  startDate: { type: String, default: '' },
+  endDate: { type: String, default: 'Present' }
 }, { timestamps: true });
 
 export default mongoose.model('TeamMember', TeamMemberSchema);

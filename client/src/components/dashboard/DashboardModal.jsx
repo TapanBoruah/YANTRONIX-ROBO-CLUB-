@@ -14,7 +14,8 @@ const DashboardModal = ({
   handleImageUpload,
   workingStepInput,
   setWorkingStepInput,
-  loggedInUser
+  loggedInUser,
+  isSaving
 }) => {
   if (!isOpen) return null;
 
@@ -54,6 +55,7 @@ const DashboardModal = ({
 
           {}
           <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-grow">
+            <fieldset disabled={isSaving} className="space-y-4">
             
             {}
             {activeTab === 'projects' && (
@@ -178,6 +180,55 @@ const DashboardModal = ({
                   <div className="flex gap-2 items-center">
                     <input
                       type="text"
+                      value={formData.image || ''}
+                      onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                      placeholder="Paste image URL or choose file..."
+                      className="flex-grow px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                    />
+                    <label className="cursor-pointer px-3 py-2 bg-cyber-border hover:bg-cyber-glow hover:text-black rounded text-xs font-mono transition-colors whitespace-nowrap">
+                      {uploadingImage ? 'Uploading...' : 'Choose File'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={uploadingImage}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'gallery' && (
+              <>
+                <div className="space-y-1">
+                  <label className="block text-xs font-mono text-gray-400 uppercase">Image Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title || ''}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="e.g. Quadcopter Calibrations"
+                    className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-mono text-gray-400 uppercase">Description / Caption</label>
+                  <textarea
+                    rows={3}
+                    value={formData.description || ''}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Optional description of the image"
+                    className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-mono text-gray-400 uppercase">Image Upload / URL</label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      required
                       value={formData.image || ''}
                       onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                       placeholder="Paste image URL or choose file..."
@@ -508,6 +559,51 @@ const DashboardModal = ({
                         </label>
                       </div>
                     </div>
+                    {activeTab === 'team' && (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="block text-xs font-mono text-gray-400 uppercase">Start Date</label>
+                            <input
+                              type="date"
+                              value={formData.startDate || ''}
+                              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                              className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                            />
+                          </div>
+                          <div className="space-y-1 flex flex-col justify-end">
+                            <label className="flex items-center space-x-2 text-xs font-mono text-gray-400 cursor-pointer select-none mb-2">
+                              <input
+                                type="checkbox"
+                                checked={!formData.endDate || formData.endDate === 'Present'}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFormData({ ...formData, endDate: 'Present' });
+                                  } else {
+                                    setFormData({ ...formData, endDate: new Date().toISOString().split('T')[0] });
+                                  }
+                                }}
+                                className="rounded border-cyber-border bg-cyber-darker text-cyber-glow focus:ring-cyber-glow"
+                              />
+                              <span>Currently Serving (Active)</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {(!formData.endDate || formData.endDate !== 'Present') && (
+                          <div className="space-y-1">
+                            <label className="block text-xs font-mono text-gray-400 uppercase">End Date</label>
+                            <input
+                              type="date"
+                              required={formData.endDate !== 'Present'}
+                              value={formData.endDate && formData.endDate !== 'Present' ? formData.endDate : ''}
+                              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                              className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                            />
+                          </div>
+                        )}
+                      </>
+                    )}
 
                     {loggedInUser?.role === 'super' && modalType === 'edit' && (
                       <div className="space-y-1">
@@ -657,6 +753,51 @@ const DashboardModal = ({
                     />
                   </div>
                 </div>
+                {activeTab === 'roster' && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="block text-xs font-mono text-gray-400 uppercase">Start Date</label>
+                        <input
+                          type="date"
+                          value={formData.startDate || ''}
+                          onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                          className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-1 flex flex-col justify-end">
+                        <label className="flex items-center space-x-2 text-xs font-mono text-gray-400 cursor-pointer select-none mb-2">
+                          <input
+                            type="checkbox"
+                            checked={!formData.endDate || formData.endDate === 'Present'}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData({ ...formData, endDate: 'Present' });
+                              } else {
+                                setFormData({ ...formData, endDate: new Date().toISOString().split('T')[0] });
+                              }
+                            }}
+                            className="rounded border-cyber-border bg-cyber-darker text-cyber-glow focus:ring-cyber-glow"
+                          />
+                          <span>Currently Serving (Active)</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    {(!formData.endDate || formData.endDate !== 'Present') && (
+                      <div className="space-y-1">
+                        <label className="block text-xs font-mono text-gray-400 uppercase">End Date</label>
+                        <input
+                          type="date"
+                          required={formData.endDate !== 'Present'}
+                          value={formData.endDate && formData.endDate !== 'Present' ? formData.endDate : ''}
+                          onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                          className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className="space-y-1">
                   <label className="block text-xs font-mono text-gray-400 uppercase">Avatar Image Upload / URL</label>
                   <div className="flex gap-2 items-center">
@@ -682,20 +823,31 @@ const DashboardModal = ({
               </>
             )}
 
+            </fieldset>
+
             {}
             <div className="pt-4 border-t border-cyber-border/20 flex justify-end space-x-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-cyber-border hover:bg-cyber-card/80 rounded text-xs font-mono text-gray-400 hover:text-white"
+                disabled={isSaving}
+                className="px-4 py-2 border border-cyber-border hover:bg-cyber-card/80 rounded text-xs font-mono text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-cyber-glow text-black font-semibold rounded text-xs font-mono hover:scale-102 transition-transform"
+                disabled={isSaving || uploadingImage}
+                className="px-5 py-2.5 bg-gradient-to-r from-cyber-glow via-cyan-400 to-cyan-500 text-black font-semibold rounded text-xs font-mono hover:scale-105 active:scale-95 hover:shadow-[0_0_18px_rgba(6,182,212,0.5)] transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Save Changes
+                {isSaving ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
               </button>
             </div>
 

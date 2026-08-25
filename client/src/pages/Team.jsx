@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { ClubContext } from '../context/ClubContext';
-import { Mail, Shield, GraduationCap, Award } from 'lucide-react';
-import { getUploadsUrl } from '../utils/api';
+import { Mail, Shield, GraduationCap, Award, RotateCcw } from 'lucide-react';
+import { getUploadsUrl, formatDate } from '../utils/api';
 
 const GithubIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -35,7 +35,7 @@ const Team = () => {
     );
   }
 
-  const { coordinator, president, core, members } = team;
+  const { coordinator, president, core, members, past } = team;
 
   if (!coordinator && !president && core.length === 0 && members.length === 0) {
     return (
@@ -225,6 +225,60 @@ const Team = () => {
           ))}
         </div>
       </div>
+
+      {past && past.length > 0 && (
+        <div className="space-y-6 pt-16 border-t border-cyber-border/20 mt-16 text-left">
+          <div className="flex items-center space-x-2 border-b border-cyber-border/30 pb-3">
+            <RotateCcw className="w-5 h-5 text-cyber-glow" />
+            <h2 className="text-lg font-bold font-sans uppercase tracking-wider">Past Members & Alumni</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {past.map((member) => (
+              <div key={member.id} className="glass-card p-5 rounded-xl flex flex-col items-center text-center justify-center space-y-4 border border-cyber-border/20 opacity-85 hover:opacity-100 hover:border-cyber-glow/30 transition-all group">
+                <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-900 border border-cyber-border flex-shrink-0 relative flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
+                  {member.image ? (
+                    <img src={getUploadsUrl(member.image)} alt={member.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cyber-darker to-cyber-border text-cyber-glow font-mono font-bold text-xl select-none">
+                      {getInitials(member.name)}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1.5 w-full">
+                  <h3 className="text-base font-bold font-sans text-white leading-tight">{member.name}</h3>
+                  <span className="inline-block text-[11px] font-mono text-gray-400 bg-cyber-border/40 px-2 py-0.5 rounded border border-cyber-border/10">
+                    {member.role || 'Member'}
+                  </span>
+                  <p className="text-[11px] font-mono text-cyan-400/80 mt-1.5">
+                    {formatDate(member.startDate)} &mdash; {formatDate(member.endDate)}
+                  </p>
+                </div>
+                <div className="w-full flex justify-center space-x-3 pt-2 border-t border-cyber-border/10">
+                  {member.github ? (
+                    <a href={member.github} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-cyber-glow transition-colors">
+                      <GithubIcon className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="text-gray-700 cursor-not-allowed">
+                      <GithubIcon className="w-3.5 h-3.5 opacity-30" />
+                    </span>
+                  )}
+                  {member.linkedin ? (
+                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-cyber-glow transition-colors">
+                      <LinkedinIcon className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <span className="text-gray-700 cursor-not-allowed">
+                      <LinkedinIcon className="w-3.5 h-3.5 opacity-30" />
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
     </div>
   );
