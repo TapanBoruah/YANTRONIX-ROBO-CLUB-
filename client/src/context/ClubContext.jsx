@@ -87,6 +87,36 @@ export const ClubProvider = ({ children }) => {
         past: flatTeam.filter(t => isPastMember(t)).map(mapDoc)
       };
       setTeam(structuredTeam);
+
+      // Check if loggedInUser is out of sync due to database reseeding or ID changes
+      const currentUserStr = localStorage.getItem('yantronix_logged_in_user');
+      if (currentUserStr) {
+        try {
+          const currentUserObj = JSON.parse(currentUserStr);
+          if (currentUserObj && currentUserObj.name) {
+            const cleanName = currentUserObj.name.toLowerCase();
+            if (currentUserObj.role === 'member') {
+              const matchingRoster = rostRes.find(r => r.username && r.username.toLowerCase() === cleanName);
+              if (matchingRoster && matchingRoster._id !== currentUserObj.id) {
+                console.log('Auto-healing roster member session ID from', currentUserObj.id, 'to', matchingRoster._id);
+                const updatedUser = { ...currentUserObj, id: matchingRoster._id };
+                setLoggedInUser(updatedUser);
+                localStorage.setItem('yantronix_logged_in_user', JSON.stringify(updatedUser));
+              }
+            } else {
+              const matchingMember = teamRes.find(m => m.username && m.username.toLowerCase() === cleanName);
+              if (matchingMember && matchingMember._id !== currentUserObj.id) {
+                console.log('Auto-healing team member session ID from', currentUserObj.id, 'to', matchingMember._id);
+                const updatedUser = { ...currentUserObj, id: matchingMember._id };
+                setLoggedInUser(updatedUser);
+                localStorage.setItem('yantronix_logged_in_user', JSON.stringify(updatedUser));
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing loggedInUser for session auto-heal:', e);
+        }
+      }
     } catch (error) {
       console.error('Failed to fetch data from backend API:', error);
     } finally {
