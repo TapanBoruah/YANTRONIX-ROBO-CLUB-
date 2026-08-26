@@ -60,8 +60,8 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
 
       <div className="space-y-3">
         <h4 className="text-xs font-mono tracking-wider text-cyan-500 uppercase">Vice Presidents, Web Coordinators & Core Committee</h4>
-        <div className="overflow-x-auto border border-cyber-border/40 rounded-lg">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto border border-cyber-border/40 rounded-lg scrollbar-thin scrollbar-thumb-cyber-border">
+          <table className="w-full text-left border-collapse min-w-[950px]">
             <thead>
               <tr className="bg-cyber-darker/60 border-b border-cyber-border text-xs font-mono text-cyan-400 uppercase">
                 <th className="px-4 py-3">Name</th>
@@ -97,7 +97,7 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                     </span>
                   </td>
                   {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
-                    <td className="px-4 py-3 font-mono text-xs text-cyan-400 select-all">
+                    <td className="px-4 py-3 font-mono text-xs text-cyan-400 select-all whitespace-nowrap">
                       {member.username ? `${member.username} / ${member.password}` : 'None'}
                     </td>
                   )}
@@ -136,18 +136,18 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-lg bg-cyber-darker/20 border border-cyber-border/40">
           {team.members.map((member) => (
-            <div key={member.id} className="flex items-start justify-between px-3 py-1.5 rounded bg-cyber-card border border-cyber-border text-xs text-gray-300 font-mono">
-              <span className="truncate">
-                <span>{member.name}</span>
+            <div key={member.id} className="flex items-start justify-between px-3 py-2 rounded bg-cyber-card border border-cyber-border text-xs text-gray-300 font-mono min-w-0">
+              <div className="min-w-0 flex-grow pr-2">
+                <div className="font-semibold text-white truncate" title={member.name}>{member.name}</div>
                 {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && member.username && (
-                  <span className="block text-[9px] text-cyan-400 font-mono mt-0.5 select-all">
+                  <div className="text-[9px] text-cyan-400 font-mono mt-1 select-all whitespace-normal break-all">
                     {member.username} / {member.password}
-                  </span>
+                  </div>
                 )}
-              </span>
+              </div>
               <button
                 onClick={() => onEdit({ ...member, type: 'member' })}
-                className="text-gray-500 hover:text-cyber-glow font-mono text-[10px] ml-2 mt-0.5 focus:outline-none flex-shrink-0"
+                className="text-gray-500 hover:text-cyber-glow font-mono text-[10px] focus:outline-none flex-shrink-0 mt-0.5"
                 title="Edit member"
               >
                 Edit
@@ -166,8 +166,8 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
             <RotateCcw className="w-4 h-4 text-cyan-500" />
             <h4 className="text-xs font-mono tracking-wider text-cyan-500 uppercase">Past Members & Alumni</h4>
           </div>
-          <div className="overflow-x-auto border border-cyber-border/40 rounded-lg">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto border border-cyber-border/40 rounded-lg scrollbar-thin scrollbar-thumb-cyber-border">
+            <table className="w-full text-left border-collapse min-w-[850px]">
               <thead>
                 <tr className="bg-cyber-darker/60 border-b border-cyber-border text-xs font-mono text-cyan-400 uppercase">
                   <th className="px-4 py-3">Name</th>
@@ -193,11 +193,11 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-400">{member.role}</td>
-                    <td className="px-4 py-3 text-center text-xs font-mono text-cyan-400">
+                    <td className="px-4 py-3 text-center text-xs font-mono text-cyan-400 whitespace-nowrap">
                       {formatDate(member.startDate)} - {formatDate(member.endDate)}
                     </td>
                     {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
-                      <td className="px-4 py-3 font-mono text-xs text-red-400/80">
+                      <td className="px-4 py-3 font-mono text-xs text-red-400/80 whitespace-nowrap">
                         Login Disabled (Past Member)
                       </td>
                     )}

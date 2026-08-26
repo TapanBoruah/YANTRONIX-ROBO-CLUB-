@@ -38,8 +38,8 @@ const Footer = () => {
           {}
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded bg-cyber-card border border-cyber-glow/30 flex items-center justify-center">
-                <Cpu className="w-4 h-4 text-cyber-glow" />
+              <div className="w-8 h-8 rounded-full bg-cyber-card border border-cyber-glow/30 flex items-center justify-center overflow-hidden">
+                <img src="/logo.jpg" alt="यंत्रonix Logo" className="w-full h-full object-cover rounded-full" />
               </div>
               <span className="text-lg font-bold tracking-wider text-white">
                 यंत्रonix
@@ -111,7 +111,12 @@ const Footer = () => {
           <div className="flex space-x-4">
             <Link to="/admin/login" className="hover:text-cyber-glow transition-colors duration-200">Admin Login</Link>
             <span>&bull;</span>
-            <span className="text-gray-600">Website created by Krish & Tapan</span>
+            <span className="text-gray-600">
+              Website created by{' '}
+              <a href="https://www.linkedin.com/in/krishprasad-kp/" target="_blank" rel="noopener noreferrer" className="hover:text-cyber-glow transition-colors duration-200">Krish</a>
+              {' '}&{' '}
+              <a href="https://www.linkedin.com/in/tapan-boruah-391a08330/" target="_blank" rel="noopener noreferrer" className="hover:text-cyber-glow transition-colors duration-200">Tapan</a>
+            </span>
           </div>
         </div>
       </div>

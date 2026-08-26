@@ -76,7 +76,7 @@ const Gallery = () => {
       {/* Image Modal overlay */}
       <AnimatePresence>
         {selectedImage && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -88,25 +88,27 @@ const Gallery = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative max-w-4xl w-full bg-cyber-card border border-cyber-glow/30 rounded-2xl overflow-hidden shadow-[0_0_35px_rgba(6,182,212,0.25)] flex flex-col z-10"
+              className="relative max-w-4xl w-full max-h-[90vh] bg-cyber-card border border-cyber-glow/30 rounded-2xl overflow-hidden shadow-[0_0_35px_rgba(6,182,212,0.25)] flex flex-col z-10"
             >
-              <div className="relative aspect-video bg-black flex items-center justify-center">
+              <div className="relative flex-grow bg-black flex items-center justify-center overflow-hidden p-2 min-h-[250px] max-h-[65vh]">
                 <img
                   src={getUploadsUrl(selectedImage.image)}
                   alt={selectedImage.title}
-                  className="max-h-[75vh] w-full object-contain"
+                  className="max-h-[60vh] max-w-full object-contain rounded-lg"
                 />
                 <button
                   onClick={() => setSelectedImage(null)}
-                  className="absolute top-4 right-4 p-2 rounded bg-black/60 text-gray-300 hover:text-white border border-cyber-border"
+                  className="absolute top-4 right-4 p-2 rounded-full bg-black/70 text-gray-300 hover:text-white border border-cyber-border hover:border-cyber-glow/50 transition-all duration-200"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-6 text-left space-y-2 border-t border-cyber-border">
-                <h3 className="text-lg font-bold text-white font-sans">{selectedImage.title}</h3>
+              <div className="p-5 sm:p-6 text-left space-y-2 border-t border-cyber-border bg-cyber-card/95">
+                <h3 className="text-base sm:text-lg font-bold text-white font-sans">{selectedImage.title}</h3>
                 {selectedImage.description && (
-                  <p className="text-xs text-gray-400 font-mono leading-relaxed">{selectedImage.description}</p>
+                  <p className="text-xs text-gray-400 font-mono leading-relaxed max-h-[12vh] overflow-y-auto pr-2">
+                    {selectedImage.description}
+                  </p>
                 )}
               </div>
             </motion.div>

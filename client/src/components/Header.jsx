@@ -26,9 +26,9 @@ const Header = () => {
         <div className="flex items-center justify-between h-20">
           {}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="relative flex items-center justify-center w-10 h-10 rounded-lg bg-cyber-card border border-cyber-glow/30 group-hover:border-cyber-glow/80 transition-colors duration-300">
-              <Cpu className="w-5 h-5 text-cyber-glow animate-pulse" />
-              <div className="absolute inset-0 rounded-lg bg-cyber-glow/10 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-cyber-card border border-cyber-glow/30 group-hover:border-cyber-glow/80 transition-colors duration-300 overflow-hidden">
+              <img src="/logo.jpg" alt="यंत्रonix Logo" className="w-full h-full object-cover rounded-full" />
+              <div className="absolute inset-0 rounded-full bg-cyber-glow/10 blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold tracking-wider font-sans bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-200 to-cyber-glow group-hover:neon-text-cyan transition-all duration-300">
