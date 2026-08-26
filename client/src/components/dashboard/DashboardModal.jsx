@@ -404,22 +404,35 @@ const DashboardModal = ({
                         className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
                       />
                     </div>
-                    <div className="space-y-1">
-                      <label className="block text-xs font-mono text-gray-400 uppercase">Position Category</label>
-                      <select
-                        value={formData.position || 'core committee'}
-                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                        className="w-full px-3 py-2.5 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
-                      >
-                        <option value="faculty">Faculty Advisor/Coordinator</option>
-                        <option value="president">President</option>
-                        <option value="vice_president">Vice President</option>
-                        <option value="web_coordinator">Web Coordinator</option>
-                        <option value="student_representative">Student Representative</option>
-                        <option value="core committee">Core Committee</option>
-                        <option value="member">Member</option>
-                      </select>
-                    </div>
+                    {activeTab === 'my_profile' ? (
+                      <div className="space-y-1">
+                        <label className="block text-xs font-mono text-gray-400 uppercase">Position Category</label>
+                        <input
+                          type="text"
+                          readOnly
+                          disabled
+                          value={formData.position ? formData.position.replace('_', ' ').toUpperCase() : 'CORE COMMITTEE'}
+                          className="w-full px-3 py-2 rounded bg-cyber-darker/60 border border-cyber-border/40 text-sm text-gray-400 cursor-not-allowed focus:outline-none"
+                        />
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        <label className="block text-xs font-mono text-gray-400 uppercase">Position Category</label>
+                        <select
+                          value={formData.position || 'core committee'}
+                          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                          className="w-full px-3 py-2.5 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
+                        >
+                          <option value="faculty">Faculty Advisor/Coordinator</option>
+                          <option value="president">President</option>
+                          <option value="vice_president">Vice President</option>
+                          <option value="web_coordinator">Web Coordinator</option>
+                          <option value="student_representative">Student Representative</option>
+                          <option value="core committee">Core Committee</option>
+                          <option value="member">Member</option>
+                        </select>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label className="block text-xs font-mono text-gray-400 uppercase">Designation Role</label>
