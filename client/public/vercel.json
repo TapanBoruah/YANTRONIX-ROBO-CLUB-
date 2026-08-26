@@ -10,7 +10,7 @@
       "destination": "https://yantronix-server.onrender.com/uploads/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "destination": "/index.html"
     }
   ]
