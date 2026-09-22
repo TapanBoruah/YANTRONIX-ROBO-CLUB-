@@ -95,7 +95,7 @@ const MyRecordSection = ({ roster, loggedInUser, onEdit, onLogout }) => {
               onClick={() => onEdit(recordObj)}
               className="px-4 py-2 border border-amber-500/50 hover:bg-amber-500/10 text-amber-400 text-xs font-mono rounded transition-colors"
             >
-              Edit Registration Info
+              Edit Profile Details & Credentials
             </button>
           </div>
         </div>

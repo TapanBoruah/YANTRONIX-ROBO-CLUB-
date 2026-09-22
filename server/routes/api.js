@@ -140,7 +140,7 @@ router.put('/users/credentials', async (req, res) => {
 
     if (cleanUsername) {
       const conflict = await User.findOne({ username: cleanUsername });
-      if (conflict && conflict.targetId !== targetId) {
+      if (conflict && conflict.targetId !== targetId && conflict._id.toString() !== targetId) {
         return res.status(400).json({ message: 'Username is already taken by another user.' });
       }
     }
@@ -149,11 +149,33 @@ router.put('/users/credentials', async (req, res) => {
     if (cleanUsername) updateFields.username = cleanUsername;
     if (newPassword) updateFields.password = newPassword;
 
-    const updated = await User.findOneAndUpdate(
-      { targetId },
+    let updated = await User.findOneAndUpdate(
+      { $or: [{ targetId: targetId }, { _id: targetId }] },
       { $set: updateFields },
       { new: true }
     );
+
+    if (!updated) {
+      const tm = await TeamMember.findOne({ $or: [{ _id: targetId }, { rosterId: targetId }] });
+      if (tm) {
+        updated = await User.findOneAndUpdate(
+          { $or: [{ targetId: tm._id.toString() }, { targetId: tm.rosterId }] },
+          { $set: updateFields },
+          { new: true }
+        );
+      }
+    }
+
+    if (!updated) {
+      const rm = await Roster.findOne({ $or: [{ _id: targetId }, { teamMemberId: targetId }] });
+      if (rm) {
+        updated = await User.findOneAndUpdate(
+          { $or: [{ targetId: rm._id.toString() }, { targetId: rm.teamMemberId }] },
+          { $set: updateFields },
+          { new: true }
+        );
+      }
+    }
 
     if (!updated) {
       return res.status(404).json({ message: 'User account not found.' });
@@ -486,6 +508,25 @@ router.get('/team', async (req, res) => {
           mObj.username = user.username;
           mObj.password = user.password;
         }
+
+        // Link with roster to ensure phone, email, year, sem, roll, etc. are populated
+        const rosterQuery = [];
+        if (m.rosterId) rosterQuery.push({ _id: m.rosterId });
+        rosterQuery.push({ teamMemberId: m._id.toString() });
+        if (m.name) rosterQuery.push({ name: m.name });
+
+        const rosterDoc = await Roster.findOne({ $or: rosterQuery });
+        if (rosterDoc) {
+          if (!mObj.phone || mObj.phone === 'Pending') mObj.phone = rosterDoc.phone;
+          if (!mObj.email || mObj.email === 'Pending') mObj.email = rosterDoc.email;
+          if (!mObj.roll || mObj.roll === 'Pending') mObj.roll = rosterDoc.roll;
+          if (!mObj.year || mObj.year === '1st Year') mObj.year = rosterDoc.year;
+          if (!mObj.sem || mObj.sem === '1st Sem') mObj.sem = rosterDoc.sem;
+          if (!mObj.github) mObj.github = rosterDoc.github;
+          if (!mObj.linkedin) mObj.linkedin = rosterDoc.linkedin;
+          if (!mObj.image) mObj.image = rosterDoc.image;
+        }
+
         return mObj;
       })
     );

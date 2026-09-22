@@ -833,6 +833,34 @@ const DashboardModal = ({
                     </label>
                   </div>
                 </div>
+
+                {activeTab === 'my_record' && modalType === 'edit' && (
+                  <div className="pt-4 border-t border-cyber-border/20 space-y-3">
+                    <p className="text-[10px] font-mono text-yellow-400 uppercase tracking-widest">Change Login Credentials (optional)</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="block text-xs font-mono text-gray-400 uppercase">New Username</label>
+                        <input
+                          type="text"
+                          value={formData.newUsername || ''}
+                          onChange={(e) => setFormData({ ...formData, newUsername: e.target.value })}
+                          placeholder="Leave blank to keep current"
+                          className="w-full px-3 py-2 rounded bg-cyber-darker border border-yellow-500/30 text-sm text-white focus:outline-none focus:border-yellow-400/50"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="block text-xs font-mono text-gray-400 uppercase">New Password</label>
+                        <input
+                          type="password"
+                          value={formData.newPassword || ''}
+                          onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                          placeholder="Leave blank to keep current"
+                          className="w-full px-3 py-2 rounded bg-cyber-darker border border-yellow-500/30 text-sm text-white focus:outline-none focus:border-yellow-400/50"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             )}
 

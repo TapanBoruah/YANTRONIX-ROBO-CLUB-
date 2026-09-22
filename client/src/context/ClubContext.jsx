@@ -427,6 +427,11 @@ export const ClubProvider = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok) {
+        if (data.username && loggedInUser && (loggedInUser.id === targetId || loggedInUser._id === targetId)) {
+          const updatedUser = { ...loggedInUser, name: data.username.toUpperCase() };
+          setLoggedInUser(updatedUser);
+          localStorage.setItem('yantronix_logged_in_user', JSON.stringify(updatedUser));
+        }
         return { success: true, username: data.username };
       } else {
         return { success: false, message: data.message || 'Failed to update credentials.' };
