@@ -272,8 +272,8 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-cyber-bg flex flex-col relative text-left">
       <div className="absolute inset-0 grid-overlay opacity-10 pointer-events-none"></div>
 
-      {}
-      <header className="border-b border-cyber-border/80 bg-cyber-card/50 backdrop-blur-md relative z-20 px-6 py-4 flex items-center justify-between">
+      {/* Fixed/Sticky Cockpit Header */}
+      <header className="border-b border-cyber-border/80 bg-cyber-card/80 backdrop-blur-md sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-md">
         <div className="flex items-center space-x-3">
           <Shield className="w-5 h-5 text-cyber-glow animate-pulse" />
           <h1 className="text-lg font-bold font-sans tracking-wide text-white">यंत्रonix CONTROL COCKPIT</h1>
@@ -299,8 +299,8 @@ const AdminDashboard = () => {
 
       <div className="flex-grow flex flex-col md:flex-row relative z-10">
         
-        {}
-        <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-cyber-border/40 p-4 space-y-2 flex-shrink-0">
+        {/* Fixed/Sticky Left Navigation Sidebar */}
+        <aside className="w-full md:w-64 md:sticky md:top-[65px] md:self-start md:h-[calc(100vh-65px)] md:overflow-y-auto border-b md:border-b-0 md:border-r border-cyber-border/40 p-4 space-y-2 flex-shrink-0 scrollbar-thin scrollbar-thumb-cyber-border/40">
           {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
             <>
               {loggedInUser?.role === 'super' && (
@@ -439,7 +439,7 @@ const AdminDashboard = () => {
               )}
 
               {activeTab === 'roster' && (
-                <RosterTable roster={activeRoster} loggedInUser={loggedInUser} onEdit={openEditModal} onDelete={handleDelete} />
+                <RosterTable roster={roster} loggedInUser={loggedInUser} onEdit={openEditModal} onDelete={handleDelete} />
               )}
 
               {activeTab === 'gallery' && (

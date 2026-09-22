@@ -144,11 +144,6 @@ const Team = () => {
               <div>
                 <h2 className="text-xl font-bold font-sans text-white">{president.name}</h2>
                 <p className="text-sm text-gray-400 font-medium leading-tight mt-0.5">{president.role}</p>
-                {formatAcademic(president.year, president.sem) && (
-                  <span className="inline-block text-[10px] font-mono text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-500/25 mt-1.5">
-                    {formatAcademic(president.year, president.sem)}
-                  </span>
-                )}
               </div>
 
               {/* Contact Information */}
