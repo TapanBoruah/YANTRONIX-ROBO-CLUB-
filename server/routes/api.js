@@ -239,20 +239,20 @@ router.post('/users/create', async (req, res) => {
       await User.create({ username: cleanUsername, password, role: 'super', targetId: teamMember._id.toString() });
 
     } else if (position === 'web_coordinator') {
-      const teamMember = await TeamMember.create({
-        name, type: 'core', role: 'Web Coordinator', position: 'web_coordinator',
-        github: '', linkedin: '', email: '', image: '', order: 4,
-        startDate: '', endDate: 'Present'
-      });
       const rosterMember = await Roster.create({
         name, roll: 'Pending', phone: 'Pending', email: 'Pending',
         year: '1st Year', sem: '1st Sem',
-        teamMemberId: teamMember._id.toString(),
-        github: '', linkedin: '', image: '', order: 4,
+        github: '', linkedin: '', image: '', order: 99,
         startDate: '', endDate: 'Present'
       });
-      teamMember.rosterId = rosterMember._id.toString();
-      await teamMember.save();
+      const teamMember = await TeamMember.create({
+        name, type: 'member', role: 'Club Member', position: 'web_coordinator',
+        rosterId: rosterMember._id.toString(),
+        github: '', linkedin: '', email: '', image: '', order: 99,
+        startDate: '', endDate: 'Present'
+      });
+      rosterMember.teamMemberId = teamMember._id.toString();
+      await rosterMember.save();
       await User.create({ username: cleanUsername, password, role: 'super', targetId: teamMember._id.toString() });
 
     } else if (position === 'student_representative') {
@@ -507,6 +507,16 @@ router.get('/team', async (req, res) => {
         if (user) {
           mObj.username = user.username;
           mObj.password = user.password;
+          mObj.clearanceRole = user.role;
+        }
+
+        // If position is web_coordinator, ensure type is member for frontend categorization (normal member with super access)
+        if (m.position === 'web_coordinator') {
+          mObj.type = 'member';
+        }
+        // If position is student_representative, ensure type is core for frontend categorization (Core Committee)
+        if (m.position === 'student_representative') {
+          mObj.type = 'core';
         }
 
         // Link with roster to ensure phone, email, year, sem, roll, etc. are populated
@@ -553,7 +563,7 @@ router.put('/team/:id', async (req, res) => {
         req.body.type = 'coordinator';
       } else if (req.body.position === 'president') {
         req.body.type = 'president';
-      } else if (req.body.position === 'member') {
+      } else if (req.body.position === 'member' || req.body.position === 'web_coordinator') {
         req.body.type = 'member';
       } else {
         req.body.type = 'core';
@@ -561,16 +571,23 @@ router.put('/team/:id', async (req, res) => {
     }
     const member = await TeamMember.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (member) {
-      if (req.body.position) {
-        let newRole = 'core';
-        if (['president', 'vice_president', 'web_coordinator'].includes(req.body.position)) {
-          newRole = 'super';
-        } else if (req.body.position === 'student_representative') {
-          newRole = 'rep';
-        } else if (req.body.position === 'member') {
-          newRole = 'member';
+      if (req.body.position || req.body.clearanceRole) {
+        let newRole = req.body.clearanceRole;
+        if (!newRole) {
+          if (['president', 'vice_president', 'web_coordinator'].includes(req.body.position)) {
+            newRole = 'super';
+          } else if (req.body.position === 'student_representative') {
+            newRole = 'rep';
+          } else if (req.body.position === 'member') {
+            newRole = 'member';
+          } else {
+            newRole = 'core';
+          }
         }
-        await User.findOneAndUpdate({ targetId: member._id.toString() }, { $set: { role: newRole } });
+        await User.findOneAndUpdate(
+          { targetId: { $in: [member._id.toString(), member.rosterId].filter(Boolean) } },
+          { $set: { role: newRole } }
+        );
       }
 
       if (member.rosterId) {
@@ -628,6 +645,9 @@ router.get('/roster', async (req, res) => {
         if (user) {
           rObj.username = user.username;
           rObj.password = user.password;
+          rObj.clearanceRole = user.role;
+        } else {
+          rObj.clearanceRole = 'member';
         }
         return rObj;
       })
@@ -643,12 +663,39 @@ router.post('/roster', async (req, res) => {
     const student = new Roster(req.body);
     await student.save();
     
-    
+    const userRole = req.body.clearanceRole || (req.body.position === 'web_coordinator' ? 'super' : req.body.position === 'student_representative' ? 'rep' : 'member');
+    const memberPosition = req.body.position || (userRole === 'super' ? 'web_coordinator' : userRole === 'rep' ? 'student_representative' : 'member');
+    const memberType = (memberPosition === 'web_coordinator' || memberPosition === 'member') ? 'member' : 'core';
+    const memberRole = memberPosition === 'student_representative' ? 'Student Representative' : 'Club Member';
+
+    // Create synchronized TeamMember
+    const teamMember = await TeamMember.create({
+      name: student.name,
+      type: memberType,
+      role: memberRole,
+      position: memberPosition,
+      rosterId: student._id.toString(),
+      phone: student.phone || 'Pending',
+      email: student.email || 'Pending',
+      roll: student.roll || 'Pending',
+      year: student.year || '1st Year',
+      sem: student.sem || '1st Sem',
+      github: student.github || '',
+      linkedin: student.linkedin || '',
+      image: student.image || '',
+      order: memberPosition === 'student_representative' ? 6 : 99,
+      startDate: student.startDate || '',
+      endDate: student.endDate || 'Present'
+    });
+
+    student.teamMemberId = teamMember._id.toString();
+    await student.save();
+
     const username = `member_${student.name.toLowerCase().replace(/\s+/g, '')}`;
     await User.create({
       username,
       password: 'member123',
-      role: 'member',
+      role: userRole,
       targetId: student._id.toString()
     });
 
@@ -661,20 +708,49 @@ router.post('/roster', async (req, res) => {
 router.put('/roster/:id', async (req, res) => {
   try {
     const student = await Roster.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (student && student.teamMemberId) {
-      await TeamMember.findByIdAndUpdate(student.teamMemberId, {
-        name: student.name,
-        email: student.email,
-        github: student.github || '',
-        linkedin: student.linkedin || '',
-        image: student.image || '',
-        roll: student.roll || 'Pending',
-        phone: student.phone || 'Pending',
-        year: student.year || '1st Year',
-        sem: student.sem || '1st Sem',
-        startDate: student.startDate || '',
-        endDate: student.endDate || 'Present'
-      });
+    if (student) {
+      if (student.teamMemberId) {
+        const updateData = {
+          name: student.name,
+          email: student.email,
+          github: student.github || '',
+          linkedin: student.linkedin || '',
+          image: student.image || '',
+          roll: student.roll || 'Pending',
+          phone: student.phone || 'Pending',
+          year: student.year || '1st Year',
+          sem: student.sem || '1st Sem',
+          startDate: student.startDate || '',
+          endDate: student.endDate || 'Present'
+        };
+        if (req.body.position) {
+          updateData.position = req.body.position;
+          if (req.body.position === 'web_coordinator' || req.body.position === 'member') {
+            updateData.type = 'member';
+            if (req.body.position === 'web_coordinator') updateData.role = 'Club Member';
+          } else if (req.body.position === 'student_representative') {
+            updateData.type = 'core';
+            updateData.role = 'Student Representative';
+          }
+        }
+        await TeamMember.findByIdAndUpdate(student.teamMemberId, updateData);
+      }
+
+      if (req.body.clearanceRole || req.body.position) {
+        let newRole = req.body.clearanceRole;
+        if (!newRole && req.body.position) {
+          if (req.body.position === 'student_representative') newRole = 'rep';
+          else if (req.body.position === 'member') newRole = 'member';
+          else if (['president', 'vice_president', 'web_coordinator'].includes(req.body.position)) newRole = 'super';
+          else newRole = 'core';
+        }
+        if (newRole) {
+          await User.findOneAndUpdate(
+            { targetId: { $in: [student._id.toString(), student.teamMemberId].filter(Boolean) } },
+            { $set: { role: newRole } }
+          );
+        }
+      }
     }
     res.json(student);
   } catch (error) {

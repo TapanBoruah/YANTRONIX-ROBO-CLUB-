@@ -170,9 +170,21 @@ const RosterTable = ({ roster = [], loggedInUser, onEdit, onDelete }) => {
                       <div className="w-7 h-7 rounded-full bg-cyan-950/80 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-xs font-mono font-bold select-none flex-shrink-0">
                         {m.name ? m.name[0].toUpperCase() : 'Y'}
                       </div>
-                      <span className="truncate max-w-[140px] sm:max-w-[170px]" title={m.name}>
-                        {m.name}
-                      </span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="truncate max-w-[140px] sm:max-w-[170px]" title={m.name}>
+                          {m.name}
+                        </span>
+                        {(m.clearanceRole === 'super' || m.position === 'web_coordinator') && (
+                          <span className="inline-block text-[9px] font-mono text-emerald-400 bg-emerald-950/70 px-1.5 py-0.2 rounded border border-emerald-500/30 w-max mt-0.5">
+                            Web Coord
+                          </span>
+                        )}
+                        {(m.clearanceRole === 'rep' || m.position === 'student_representative') && (
+                          <span className="inline-block text-[9px] font-mono text-cyan-400 bg-cyan-950/70 px-1.5 py-0.2 rounded border border-cyan-500/30 w-max mt-0.5">
+                            Rep Access
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </td>
 

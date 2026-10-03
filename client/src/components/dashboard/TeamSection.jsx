@@ -59,7 +59,7 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
       </div>
 
       <div className="space-y-3">
-        <h4 className="text-xs font-mono tracking-wider text-cyan-500 uppercase">Vice Presidents, Web Coordinators & Core Committee</h4>
+        <h4 className="text-xs font-mono tracking-wider text-cyan-500 uppercase">Vice Presidents, Club Representatives & Core Committee</h4>
         <div className="overflow-x-auto border border-cyber-border/40 rounded-lg scrollbar-thin scrollbar-thumb-cyber-border">
           <table className="w-full text-left border-collapse min-w-[950px]">
             <thead>
@@ -136,9 +136,14 @@ const TeamSection = ({ team, loggedInUser, onEdit, onDelete, onAddMember }) => {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-lg bg-cyber-darker/20 border border-cyber-border/40">
           {team.members.map((member) => (
-            <div key={member.id} className="flex items-start justify-between px-3 py-2 rounded bg-cyber-card border border-cyber-border text-xs text-gray-300 font-mono min-w-0">
+            <div key={member.id} className="flex items-start justify-between px-3 py-2.5 rounded bg-cyber-card border border-cyber-border text-xs text-gray-300 font-mono min-w-0">
               <div className="min-w-0 flex-grow pr-2">
                 <div className="font-semibold text-white truncate" title={member.name}>{member.name}</div>
+                {(member.clearanceRole === 'super' || member.position === 'web_coordinator') && (
+                  <span className="inline-block text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-1.5 py-0.2 rounded border border-emerald-500/30 mt-0.5">
+                    Web Coord (Full Access)
+                  </span>
+                )}
                 {(loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && member.username && (
                   <div className="text-[9px] text-cyan-400 font-mono mt-1 select-all whitespace-normal break-all">
                     {member.username} / {member.password}

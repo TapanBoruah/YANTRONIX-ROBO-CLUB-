@@ -12,8 +12,12 @@ const MyProfileSection = ({ team, loggedInUser, onEdit, onLogout }) => {
     profileObj = team.president;
     profileType = 'president';
   } else {
-    const found = team.core.find(c => c.id === loggedInUser.id || c._id === loggedInUser.id);
+    let found = team.core.find(c => c.id === loggedInUser.id || c._id === loggedInUser.id);
     if (found) { profileObj = found; profileType = 'core'; }
+    if (!found) {
+      found = team.members.find(m => m.id === loggedInUser.id || m._id === loggedInUser.id || m.rosterId === loggedInUser.id);
+      if (found) { profileObj = found; profileType = 'member'; }
+    }
   }
 
   if (!profileObj) {

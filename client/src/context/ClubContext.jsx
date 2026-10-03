@@ -82,8 +82,8 @@ export const ClubProvider = ({ children }) => {
       const structuredTeam = {
         coordinator: coordinatorDoc ? { ...coordinatorDoc, id: coordinatorDoc._id } : null,
         president: presidentDoc ? { ...presidentDoc, id: presidentDoc._id } : null,
-        core: flatTeam.filter(t => t.type === 'core' && !isPastMember(t)).map(mapDoc),
-        members: flatTeam.filter(t => t.type === 'member' && !isPastMember(t)).map(mapDoc),
+        core: flatTeam.filter(t => (t.type === 'core' || t.position === 'student_representative') && t.position !== 'web_coordinator' && !isPastMember(t)).map(mapDoc),
+        members: flatTeam.filter(t => (t.type === 'member' || t.position === 'web_coordinator') && t.position !== 'student_representative' && !isPastMember(t)).map(mapDoc),
         past: flatTeam.filter(t => isPastMember(t)).map(mapDoc)
       };
       setTeam(structuredTeam);
@@ -95,11 +95,13 @@ export const ClubProvider = ({ children }) => {
           const currentUserObj = JSON.parse(currentUserStr);
           if (currentUserObj && currentUserObj.name) {
             const cleanName = currentUserObj.name.toLowerCase();
-            if (currentUserObj.role === 'member') {
-              const matchingRoster = rostRes.find(r => r.username && r.username.toLowerCase() === cleanName);
-              if (matchingRoster && matchingRoster._id !== currentUserObj.id) {
-                console.log('Auto-healing roster member session ID from', currentUserObj.id, 'to', matchingRoster._id);
-                const updatedUser = { ...currentUserObj, id: matchingRoster._id };
+            if (currentUserObj.role === 'member' || currentUserObj.role === 'rep') {
+              const matchingRoster = rostRes.find(r => (r.username && r.username.toLowerCase() === cleanName) || r._id === currentUserObj.id);
+              const matchingMember = teamRes.find(m => (m.username && m.username.toLowerCase() === cleanName) || m._id === currentUserObj.id);
+              const matchedId = matchingRoster ? matchingRoster._id : (matchingMember ? matchingMember._id : null);
+              if (matchedId && matchedId !== currentUserObj.id) {
+                console.log('Auto-healing session ID from', currentUserObj.id, 'to', matchedId);
+                const updatedUser = { ...currentUserObj, id: matchedId };
                 setLoggedInUser(updatedUser);
                 localStorage.setItem('yantronix_logged_in_user', JSON.stringify(updatedUser));
               }

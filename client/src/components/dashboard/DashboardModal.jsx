@@ -376,20 +376,36 @@ const DashboardModal = ({
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="block text-xs font-mono text-gray-400 uppercase">Position Category</label>
+                      <label className="block text-xs font-mono text-gray-400 uppercase">Position & Access Role</label>
                       <select
                         value={formData.position || 'core committee'}
-                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                        onChange={(e) => {
+                          const pos = e.target.value;
+                          let clearRole = 'core';
+                          if (['president', 'vice_president', 'web_coordinator'].includes(pos)) clearRole = 'super';
+                          else if (pos === 'student_representative') clearRole = 'rep';
+                          else if (pos === 'member') clearRole = 'member';
+                          setFormData({ ...formData, position: pos, clearanceRole: clearRole });
+                        }}
                         className="w-full px-3 py-2.5 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
                       >
-                        <option value="faculty">Faculty Advisor/Coordinator</option>
-                        <option value="president">President</option>
-                        <option value="vice_president">Vice President</option>
-                        <option value="web_coordinator">Web Coordinator</option>
-                        <option value="student_representative">Student Representative</option>
-                        <option value="core committee">Core Committee</option>
-                        <option value="member">Member</option>
+                        <option value="faculty">Faculty Coordinator / Advisor</option>
+                        <option value="president">President (Full Super Admin)</option>
+                        <option value="vice_president">Vice President (Core Committee & Super Admin)</option>
+                        <option value="student_representative">Student Representative (Core Committee & Rep Access)</option>
+                        <option value="core committee">Core Committee Member (Profile Access)</option>
+                        <option value="web_coordinator">Web Coordinator (Normal Member with Access to All)</option>
+                        <option value="member">General Club Member (Record Access Only)</option>
                       </select>
+                      <p className="text-[11px] font-mono text-cyan-400/90 pt-1">
+                        {formData.position === 'web_coordinator' && '💡 Web Coordinator gets full access to all sections (Projects, Events, Glossary, Gallery, Team, Roster) while public profile stays as a normal member.'}
+                        {formData.position === 'student_representative' && '💡 Student Representative is listed in Core Committee with Representative clearance (Manage Team & Roster).'}
+                        {formData.position === 'member' && '💡 Listed under Club Members (Student record access).'}
+                        {formData.position === 'core committee' && '💡 Listed under Core Committee (Profile only access).'}
+                        {formData.position === 'vice_president' && '💡 Listed under Core Committee with Super Admin clearance.'}
+                        {formData.position === 'president' && '💡 Listed under Leadership Panel with Super Admin clearance.'}
+                        {formData.position === 'faculty' && '💡 Listed under Faculty Coordinator with Core clearance.'}
+                      </p>
                     </div>
                   </>
                 ) : (
@@ -420,17 +436,31 @@ const DashboardModal = ({
                         <label className="block text-xs font-mono text-gray-400 uppercase">Position Category</label>
                         <select
                           value={formData.position || 'core committee'}
-                          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                          onChange={(e) => {
+                            const pos = e.target.value;
+                            let clearRole = formData.clearanceRole;
+                            if (!clearRole) {
+                              if (['president', 'vice_president', 'web_coordinator'].includes(pos)) clearRole = 'super';
+                              else if (pos === 'student_representative') clearRole = 'rep';
+                              else if (pos === 'member') clearRole = 'member';
+                              else clearRole = 'core';
+                            }
+                            setFormData({ ...formData, position: pos, clearanceRole: clearRole });
+                          }}
                           className="w-full px-3 py-2.5 rounded bg-cyber-darker border border-cyber-border text-sm text-white focus:outline-none"
                         >
                           <option value="faculty">Faculty Advisor/Coordinator</option>
                           <option value="president">President</option>
                           <option value="vice_president">Vice President</option>
-                          <option value="web_coordinator">Web Coordinator</option>
-                          <option value="student_representative">Student Representative</option>
+                          <option value="student_representative">Student Representative (Core Committee)</option>
                           <option value="core committee">Core Committee</option>
-                          <option value="member">Member</option>
+                          <option value="web_coordinator">Web Coordinator (Normal Member with Access to All)</option>
+                          <option value="member">General Club Member</option>
                         </select>
+                        <p className="text-[11px] font-mono text-cyan-400/90 pt-1">
+                          {formData.position === 'web_coordinator' && '💡 Web Coordinator is listed under Club Members with Full Super Admin access to all.'}
+                          {formData.position === 'student_representative' && '💡 Student Representative is listed in Core Committee with Rep management access.'}
+                        </p>
                       </div>
                     )}
                     <div className="grid grid-cols-2 gap-4">
@@ -616,6 +646,25 @@ const DashboardModal = ({
                           </div>
                         )}
                       </>
+                    )}
+
+                    {activeTab === 'team' && (loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && modalType === 'edit' && (
+                      <div className="space-y-1">
+                        <label className="block text-xs font-mono text-cyan-400 uppercase">Portal Clearance Level</label>
+                        <select
+                          value={formData.clearanceRole || (formData.position === 'student_representative' ? 'rep' : ['president', 'vice_president', 'web_coordinator'].includes(formData.position) ? 'super' : formData.position === 'member' ? 'member' : 'core')}
+                          onChange={(e) => setFormData({ ...formData, clearanceRole: e.target.value })}
+                          className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyan-500/30 text-sm text-white focus:outline-none focus:border-cyan-400/50"
+                        >
+                          <option value="member">Student Member (Record Only)</option>
+                          <option value="rep">Student Representative (Manage Team & Roster Access)</option>
+                          <option value="core">Core Committee Member (Profile Only)</option>
+                          {loggedInUser?.role === 'super' && <option value="super">Super Admin (Full Portal Access)</option>}
+                        </select>
+                        <p className="text-[10px] text-gray-500 font-mono">
+                          Control login privileges without altering public team categorization.
+                        </p>
+                      </div>
                     )}
 
                     {activeTab === 'team' && loggedInUser?.role === 'super' && modalType === 'edit' && (
@@ -833,6 +882,28 @@ const DashboardModal = ({
                     </label>
                   </div>
                 </div>
+
+                {activeTab === 'roster' && (loggedInUser?.role === 'super' || loggedInUser?.role === 'rep') && (
+                  <div className="space-y-1 p-3 rounded-lg bg-cyber-darker/60 border border-cyan-500/30">
+                    <label className="block text-xs font-mono text-cyan-400 uppercase">Portal Clearance Access Role</label>
+                    <select
+                      value={formData.clearanceRole || (formData.position === 'web_coordinator' ? 'super' : formData.position === 'student_representative' ? 'rep' : 'member')}
+                      onChange={(e) => {
+                        const clearRole = e.target.value;
+                        const newPos = clearRole === 'super' ? 'web_coordinator' : (clearRole === 'rep' ? 'student_representative' : 'member');
+                        setFormData({ ...formData, clearanceRole: clearRole, position: newPos });
+                      }}
+                      className="w-full px-3 py-2 rounded bg-cyber-darker border border-cyan-500/40 text-sm text-white focus:outline-none focus:border-cyan-400"
+                    >
+                      <option value="member">Student Member (Record Only Access)</option>
+                      <option value="rep">Student Representative (Manage Team & Roster Access)</option>
+                      {loggedInUser?.role === 'super' && <option value="super">Web Coordinator (Full Access to All)</option>}
+                    </select>
+                    <p className="text-[10px] text-gray-400 font-mono mt-1">
+                      💡 Setting Web Coordinator gives this member full portal access to all sections while keeping their public profile as a normal member.
+                    </p>
+                  </div>
+                )}
 
                 {activeTab === 'my_record' && modalType === 'edit' && (
                   <div className="pt-4 border-t border-cyber-border/20 space-y-3">

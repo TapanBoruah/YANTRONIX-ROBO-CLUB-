@@ -187,11 +187,11 @@ const Team = () => {
 
       </div>
 
-      {/* Core Committee & Officers Section (Vice Presidents, Web Coordinators, Core Members) */}
+      {/* Core Committee & Officers Section (Vice Presidents, Club Representatives, Core Members) */}
       <div className="space-y-6 mb-16">
         <div className="flex items-center space-x-2 border-b border-cyber-border/30 pb-3">
           <Award className="w-5 h-5 text-cyber-glow" />
-          <h2 className="text-lg font-bold font-sans uppercase tracking-wider">Vice Presidents & Core Committee</h2>
+          <h2 className="text-lg font-bold font-sans uppercase tracking-wider">Vice Presidents, Club Representatives & Core Committee</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -56,7 +56,11 @@ const AdminDashboard = () => {
   
   useEffect(() => {
     if (loggedInUser) {
-      if (loggedInUser.role === 'super' || loggedInUser.role === 'core' || loggedInUser.role === 'rep') {
+      if (loggedInUser.role === 'super') {
+        setActiveTab('my_profile');
+      } else if (loggedInUser.role === 'rep') {
+        setActiveTab('team');
+      } else if (loggedInUser.role === 'core') {
         setActiveTab('my_profile');
       } else if (loggedInUser.role === 'member') {
         setActiveTab('my_record');
@@ -364,7 +368,7 @@ const AdminDashboard = () => {
             </>
           )}
 
-          {(loggedInUser?.role === 'super' || loggedInUser?.role === 'core' || loggedInUser?.role === 'rep') && (
+          {(loggedInUser?.role === 'super' || loggedInUser?.role === 'core') && (
             <button
               onClick={() => handleTabChange('my_profile')}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
@@ -376,7 +380,7 @@ const AdminDashboard = () => {
             </button>
           )}
 
-          {loggedInUser?.role === 'member' && (
+          {(loggedInUser?.role === 'member' || loggedInUser?.role === 'rep') && (
             <button
               onClick={() => handleTabChange('my_record')}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
@@ -401,7 +405,7 @@ const AdminDashboard = () => {
                 </h2>
                 <p className="text-xs text-gray-500 font-mono">
                   {loggedInUser?.role === 'super' && 'Clearance Level: Super Admin (Full Access)'}
-                  {loggedInUser?.role === 'rep' && 'Clearance Level: Student Representative (Restricted Access)'}
+                  {loggedInUser?.role === 'rep' && 'Clearance Level: Student Representative (Manage Team & Roster Access)'}
                   {loggedInUser?.role === 'core' && 'Clearance Level: Core Committee Member (Profile Only)'}
                   {loggedInUser?.role === 'member' && 'Clearance Level: Student Member (Record Only)'}
                 </p>

@@ -2,7 +2,13 @@ import React from 'react';
 import { getUploadsUrl } from '../../utils/api';
 
 const MyRecordSection = ({ roster, loggedInUser, onEdit, onLogout }) => {
-  const recordObj = roster.find(r => r.id === loggedInUser.id || r._id === loggedInUser.id);
+  const recordObj = roster.find(
+    r => r.id === loggedInUser?.id || 
+         r._id === loggedInUser?.id || 
+         r.teamMemberId === loggedInUser?.id ||
+         (loggedInUser?.name && r.username && r.username.toLowerCase() === loggedInUser?.name.toLowerCase()) ||
+         (loggedInUser?.name && r.name && r.name.toLowerCase() === loggedInUser?.name.toLowerCase())
+  );
   if (!recordObj) {
     return (
       <div className="p-6 text-left max-w-xl mx-auto py-12">
